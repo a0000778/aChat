@@ -92,7 +92,7 @@ function mountOutput(link,account){
 					}));
 				break;
 				case 'channel_switch':
-					if(['success','full'].indexOf(msg.status)){
+					if(['success','full'].indexOf(msg.status)!==-1){
 						makeFakeChat(link);
 					}else{
 						console.log('[Fail] channel_switch: %s',msg.status);
