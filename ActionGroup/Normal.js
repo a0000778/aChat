@@ -19,7 +19,7 @@ Normal.action={
 		})
 	},
 	'channel_switch': function(data){
-		if(!Number.isInteger(data.id) || data.id<=0) return;
+		if(!/^\d+$/.test(data.id) || data.id<=0) return;
 		var channel=Channel.findById(data.id);
 		if(channel){
 			if(channel.join(this.user)){
@@ -53,7 +53,7 @@ Normal.action={
 		});
 	},
 	'chat_private': function(data){
-		if(!Number.isInteger(data.id) || data.id<=0) return;
+		if(!/^\d+$/.test(data.id) || data.id<=0) return;
 		if(!data.msg || typeof(data.msg)!='string' || !data.msg.length) return;
 		var target=User.findById(data.id);
 		if(target){
