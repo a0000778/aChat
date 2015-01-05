@@ -31,6 +31,7 @@ socket.on('request',function(req){
 	}
 	if(User.userList.length>=Config.userMax){
 		req.reject(4002,'Server overload.');
+		return;
 	}
 	if(req.requestedProtocols.indexOf('chatv1')>=0)
 		new User(req.accept('chatv1',req.origin));
