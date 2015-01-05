@@ -23,26 +23,27 @@ Auth.action={
 		if(!data.username){
 			return;
 		}
+		var _=this;
 		User.auth(data.username,data.password,function(result){
 			if(result===0){
-				this.user.exit(4003);
+				_.user.exit(4003);
 				return;
 			}else if(result<0){
-				this.user.exit(4102);
+				_.user.exit(4102);
 			}else if(!result.action){
-				this.user.exit(4101);
+				_.user.exit(4101);
 			}else if(User.findById(result.id)){
 				this.user.exit(4103);
 			}else{
-				this.user.id=result.id;
-				this.user.username=result.username;
-				this.user.actionGroup=new Normal(this.user);
-				this.user.send({
+				_.user.id=result.id;
+				_.user.username=result.username;
+				_.user.actionGroup=new Normal(_.user);
+				_.user.send({
 					'action': 'auth',
 					'status': 'success'
 				});
-				Channel.findById(Config.channelDefault).join(this.user,true);//進入預設頻道，無視頻道人數上限
-				this.umount();
+				Channel.findById(Config.channelDefault).join(_.user,true);//進入預設頻道，無視頻道人數上限
+				_.umount();
 			}
 		});
 	}

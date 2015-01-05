@@ -71,14 +71,15 @@ Normal.action={
 		}
 	},
 	'user_getProfile': function(data){
+		var _=this;
 		this.user.profile(null,function(error,result){
 			if(error || !result){
-				this.user.send({
+				_.user.send({
 					'action': 'user_getProfile',
 					'status': 'fail'
 				});
 			}else{
-				this.user.send({
+				_.user.send({
 					'action': 'user_getProfile',
 					'status': 'success',
 					'profile': result
@@ -94,14 +95,15 @@ Normal.action={
 			});
 			return;
 		}
+		var _=this;
 		this.user.profile(data,function(error,result){
 			if(error || !result){
-				this.user.send({
+				_.user.send({
 					'action': 'user_editProfile',
 					'status': 'fail'
 				});
 			}else{
-				this.user.send({
+				_.user.send({
 					'action': 'user_editProfile',
 					'status': 'success'
 				});
