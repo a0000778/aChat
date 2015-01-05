@@ -70,7 +70,7 @@ Normal.action={
 		if(target){
 			target.send({
 				'action': 'chat_private',
-				'formid': this.user.id,
+				'fromid': this.user.id,
 				'msg': data.msg
 			});
 			DB.writeChatLog(1,null,this.user.id,target.id,data.msg);
