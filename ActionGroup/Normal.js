@@ -1,6 +1,7 @@
 var Util=require('util');
 var Base=require('./Base.js');
 var Channel=require('../Channel.js');
+var DB=require('../DB.js');
 var User=require('../User.js');
 
 /* 一般指令組 */
@@ -51,6 +52,7 @@ Normal.action={
 			'userId': this.user.id,
 			'msg': data.msg
 		});
+		DB.writeChatLog(0,this.user.channel.id,this.user.id,null,data.msg);
 	},
 	'chat_private': function(data){
 		if(!/^\d+$/.test(data.id) || data.id<=0) return;
@@ -62,6 +64,7 @@ Normal.action={
 				'formid': this.user.id,
 				'msg': data.msg
 			});
+			DB.writeChatLog(1,null,this.user.id,target.id,data.msg);
 		}else{
 			this.user.send({
 				'action': 'chat_private_fail',
