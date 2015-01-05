@@ -33,6 +33,11 @@ Channel.prototype.exit=function(user){
 	if(index>=0){
 		this.onlineList.splice(index,1);
 		user.channel=null;
+		this.send({
+			'action': 'chat_alert_channelExit',
+			'userId': user.id,
+			'username': user.username
+		});
 	}
 	return true;
 }
@@ -40,6 +45,11 @@ Channel.prototype.join=function(user,force){
 	if(this.onlineList.indexOf(user)>=0) return true;
 	if(this.onlineMax<=this.onlineList.length && !force) return false;
 	if(user.channel) user.channel.exit(user);
+	this.send({
+		'action': 'chat_alert_channelJoin',
+		'userId': user.id,
+		'username': user.username
+	});
 	this.onlineList.push(user);
 	user.channel=this;
 	return true;
