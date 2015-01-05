@@ -74,7 +74,7 @@ var DB={};
 		writeTTL=setTimeout(DB.writeChatLogNow,Config.chatLogCacheTTL);
 		var waitWrite=chatLogCache.splice(0,Config.chatLogCacheCount);
 		pool.query(
-			'INSERT INTO `chatlog` (`time`,`type`,`channel`,`formid`,`toid`,`message`) VALUES ?;',
+			'INSERT INTO `chatlog` (`time`,`type`,`channel`,`fromid`,`toid`,`message`) VALUES ?;',
 			[waitWrite],
 			function(error,result){
 				if(error){
