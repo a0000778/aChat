@@ -66,23 +66,22 @@ DB.getAllChannel(function(error,result){
 			process.exit();
 		}else{
 			console.log('伺服器已啟動');
+			process.once('SIGINT',function(){
+				process.on('SIGINT',function(){
+					console.log('伺服器關閉中，請稍後');
+				});
+				serverLock=true;
+				User.exit(1001);
+				web.close();
+				DB.writeChatLogNow(true);
+				setInterval(function(){
+					if(!DB.chatLogCacheCount())
+						process.exit();
+					console.log('等待聊天記錄完全寫出...')
+				},1000);
+			});
 		}
 	});
-});
-
-process.once('SIGINT',function(){
-	process.on('SIGINT',function(){
-		console.log('伺服器關閉中，請稍後');
-	});
-	serverLock=true;
-	User.exit(1001);
-	web.close();
-	DB.writeChatLogNow(true);
-	setInterval(function(){
-		if(!DB.chatLogCacheCount())
-			process.exit();
-		console.log('等待聊天記錄完全寫出...')
-	},1000);
 });
 
 if(Config.debug)
