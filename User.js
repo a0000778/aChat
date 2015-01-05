@@ -5,7 +5,7 @@ const controlChars=/[\x00-\x1f\x7f]/;
 const usernameMaxLength=20;//帳號長度上限
 const profileFieldCheck={//可修改個人資料的檢查正規式
 	'email': /^[a-z0-9]+(?:(?:\+|\.)[a-z0-9]+)*@(?:[a-z0-9][a-z0-9-]*[a-z0-9])+(?:\.[a-z]{2,5}){1,2}$/i,
-	'password': /^.{32,}$/	//限制密碼預加密的最短長度
+	'password': /^.{32,}$/,	//限制密碼預加密的最短長度
 	'newPassword': /^.{32,}$/	//同上，改密碼用
 };
 const saltLength=8;//salt 長度

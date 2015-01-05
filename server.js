@@ -7,6 +7,7 @@ var https=require('https');
 var WebSocket=require('websocket');
 var Channel=require('./Channel.js');
 var Config=require('./Config.js')
+var DB=require('./DB.js');
 var User=require('./User.js');
 
 process.title='aChat - 聊天室伺服器';
