@@ -15,7 +15,7 @@ Normal.action={
 			'list': Channel.list().reduce(function(list,channel){
 				list.push({'id':channel.id,'name':channel.name})
 				return list;
-			},[]);
+			},[])
 		})
 	},
 	'channel_switch': function(data){
