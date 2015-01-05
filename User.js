@@ -1,6 +1,10 @@
 var Crypto=require('crypto');
-var ActionGroup=require('./ActionGroup.js');
+var ActionGroup;
+setImmediate(function(){//迴避互相依賴
+	ActionGroup=require('./ActionGroup.js');
+});
 var DB=require('./DB.js');
+var Config=require('./Config.js');
 const controlChars=/[\x00-\x1f\x7f]/;
 const usernameMaxLength=20;//帳號長度上限
 const profileFieldCheck={//可修改個人資料的檢查正規式
