@@ -37,6 +37,10 @@ Auth.action={
 				this.user.id=result.id;
 				this.user.username=result.username;
 				this.user.actionGroup=new Normal(this.user);
+				this.user.send({
+					'action': 'auth',
+					'status': 'success'
+				});
 				Channel.findById(Config.channelDefault).join(this.user,true);//進入預設頻道，無視頻道人數上限
 				this.umount();
 			}
