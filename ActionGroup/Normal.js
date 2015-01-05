@@ -44,6 +44,15 @@ Normal.action={
 			});
 		}
 	},
+	'channel_userList': function(){
+		this.user.send({
+			'action': 'channel_userList',
+			'list': this.user.channel.onlineList.reduce(function(list,user){
+				list.push({'id':user.id,'username':user.username});
+				return list;
+			},[])
+		});
+	},
 	'chat_normal': function(data){
 		if(!data.msg || typeof(data.msg)!='string' || !data.msg.length) return;
 		if(!this.user.channel) return;
