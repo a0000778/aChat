@@ -47,7 +47,7 @@ function connect(){
 				'username': account.username,
 				'password': account.password
 			}));
-			mountOutput(link);
+			mountOutput(link,account);
 			clientList.push(link);
 			connectSuccess++;
 		})
@@ -71,7 +71,7 @@ function makeFakeChat(link){
 	}));
 	setTimeout(makeFakeChat,Math.floor(Math.random()*9000)+1000,link);
 }
-function mountOutput(link){
+function mountOutput(link,account){
 	link
 		.on('message',function(msg){
 			if(msg.type!=='utf8'){
@@ -108,6 +108,7 @@ function mountOutput(link){
 		.on('close',function(code,msg){
 			connectClose++;
 			clientList.splice(clientList.indexOf(link),1);
+			Account.push(account);
 			if(code!==1000) console.log('Link Closed [%d] %s',code,msg);
 		})
 		.on('error',function(err){
