@@ -1,0 +1,13 @@
+{
+	"name": "aChat",
+	"description": "聊天室伺服器",
+	"version": "2.0.0",
+	"licence": "MIT License",
+	"author": "a0000778",
+	"keywords": ["chat"],
+	"dependencies": {
+		"websocket": ">=1.0.14",
+		"mysql": ">=2.5.4"
+	},
+	"main": "server.js"
+}
