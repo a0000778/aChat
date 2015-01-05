@@ -57,6 +57,7 @@ var DB={};
 /* Chat Log */
 (function(DB){
 	var chatLogCache=[];
+	var writingCount=0;
 	var writeTTL=setTimeout(DB.writeChatLogNow,Config.chatLogCacheTTL);
 	
 	DB.writeChatLog=function(type,channel,formid,toid,msg){
@@ -73,10 +74,13 @@ var DB={};
 		clearTimeout(writeTTL);
 		writeTTL=setTimeout(DB.writeChatLogNow,Config.chatLogCacheTTL);
 		var waitWrite=chatLogCache.splice(0,Config.chatLogCacheCount);
+		if(!waitWrite.length) return;
+		writingCount+=waitWrite.length;
 		pool.query(
 			'INSERT INTO `chatlog` (`time`,`type`,`channel`,`fromid`,`toid`,`message`) VALUES ?;',
 			[waitWrite],
 			function(error,result){
+				writingCount-=waitWrite.length;
 				if(error){
 					console.error('無法寫入聊天記錄，錯誤: %s',error);
 					chatLogCache.unshift.apply(chatLogCache,waitWrite);
@@ -88,7 +92,7 @@ var DB={};
 			DB.writeChatLogNow(force);
 	}
 	DB.chatLogCacheCount=function(){
-		return chatLogCache.length;
+		return chatLogCache.length+writingCount;
 	}
 })(DB);
 
