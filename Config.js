@@ -1,4 +1,5 @@
 module.exports={
+	'debug': true,					//除錯訊息輸出
 	'port': 8080,					//伺服器監聽 port
 	
 	'userMax': 1000,				//全服最大在線人數
