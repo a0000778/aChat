@@ -14,6 +14,7 @@ process.title='aChat - 聊天室伺服器';
 console.log('aChat v2.0.0 by a0000778');
 console.log('MIT Licence');
 
+var serverLock=false;
 var web=Http.createServer();
 var socket=new WebSocket.server();
 
@@ -27,6 +28,10 @@ socket.mount({
 socket.on('request',function(req){
 	if(req.requestedProtocols.indexOf('adminv1')>=0){
 		//轉接至管理指令
+		return;
+	}
+	if(serverLock){
+		req.reject(4001,'Server locked.');
 		return;
 	}
 	if(User.userList.length>=Config.userMax){
@@ -63,6 +68,21 @@ DB.getAllChannel(function(error,result){
 			console.log('伺服器已啟動');
 		}
 	});
+});
+
+process.once('SIGINT',function(){
+	process.on('SIGINT',function(){
+		console.log('伺服器關閉中，請稍後');
+	});
+	serverLock=true;
+	User.exit(1001);
+	web.close();
+	DB.writeChatLogNow(true);
+	setInterval(function(){
+		if(!DB.chatLogCacheCount())
+			process.exit();
+		console.log('等待聊天記錄完全寫出...')
+	},1000);
 });
 
 setInterval(function(){

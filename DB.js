@@ -83,6 +83,11 @@ var DB={};
 				}
 			}
 		);
+		if(force && chatLogCache.length)
+			DB.writeChatLogNow(force);
+	}
+	DB.chatLogCacheCount=function(){
+		return chatLogCache.length;
 	}
 })(DB);
 
