@@ -165,7 +165,7 @@ Admin.action={
 			var _=this;
 			DB.updateUserInfo(
 				data.userId,
-				{'action': false}
+				{'action': false},
 				function(error,result){
 					if(error){
 						_.user.send({
@@ -198,7 +198,7 @@ Admin.action={
 			var _=this;
 			DB.updateUserInfo(
 				data.userId,
-				{'action': true}
+				{'action': true},
 				function(error,result){
 					if(error){
 						_.user.send({
