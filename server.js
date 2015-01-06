@@ -88,10 +88,9 @@ if(Config.debug)
 	setInterval(function(){
 		var ram=process.memoryUsage();
 		console.log(
-			'在線: %d, RAM: %d KB (%d KB / %d KB)',
+			'在線: %d, RAM: %d KB, 聊天記錄快取: %d',
 			User.userList.length,
 			Math.floor(ram.rss/1024),
-			Math.floor(ram.heapUsed/1024),
-			Math.floor(ram.heapTotal/1024)
+			DB.chatLogCacheCount()
 		);
 	},1000);
