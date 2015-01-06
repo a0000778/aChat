@@ -11,6 +11,23 @@ function Admin(user){
 	
 }
 Util.inherits(Admin,Base);
+Admin.prototype.allUserExec=function(actionGroup,action){
+	if(Util.isArray(actionGroup)){
+		User.userList.forEach(function(user){
+			if(actionGroup.indexOf(user.actionGroup.constructor.name)!==-1){
+				var args=Array.prototype.slice(1);
+				user.actionGroup._exec.apply(user.actionGroup,args);
+			}
+		});
+	}else if(typeof(actionGroup)=='string'){
+		User.userList.forEach(function(user){
+			if(user.actionGroup.constructor.name==actionGroup){
+				var args=Array.prototype.slice(1);
+				user.actionGroup._exec.apply(user.actionGroup,args);
+			}
+		});
+	}
+}
 Admin.prototype.action={
 	'channel_create': function(data){
 		if(data.hasOwnProperty('name') && data.name.length>0){
@@ -30,10 +47,7 @@ Admin.prototype.action={
 						'action': 'channel_create',
 						'status': 'success'
 					});
-					User.send(Channel.channelList.reduce(function(list,user){
-						list.push({'id':user.id,'username':user.username});
-						return list;
-					},[]));
+					_.allUserExec('Normal',{'action':'channel_list'},Base.makeChannelList());
 				}
 			);
 		}
@@ -69,11 +83,7 @@ Admin.prototype.action={
 								'action': 'channel_edit',
 								'status': 'success'
 							});
-							//刷新所有使用者的頻道列表可以做成 function
-							User.send(Channel.channelList.reduce(function(list,user){
-								list.push({'id':user.id,'username':user.username});
-								return list;
-							},[]));
+							_.allUserExec('Normal',{'action':'channel_list'},Base.makeChannelList());
 						}
 					);
 				}
@@ -128,11 +138,7 @@ Admin.prototype.action={
 							'action': 'channel_delete',
 							'status': 'success'
 						});
-						//刷新所有使用者的頻道列表可以做成 function
-						User.send(Channel.channelList.reduce(function(list,user){
-							list.push({'id':user.id,'username':user.username});
-							return list;
-						},[]));
+						_.allUserExec('Normal',{'action':'channel_list'},Base.makeChannelList());
 					}
 				);
 			}else{

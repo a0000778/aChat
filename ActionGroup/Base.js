@@ -1,4 +1,12 @@
+var Channel=require('../Channel.js');
+
 function Base(){}
+Base.makeChannelList=function(){
+	return Channel.list().reduce(function(list,channel){
+		list.push({'id':channel.id,'name':channel.name})
+		return list;
+	},[]);
+}
 Base.prototype.exec=function(data){
 	if(data.type!=='utf8') return;
 	try{

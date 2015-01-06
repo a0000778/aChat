@@ -10,13 +10,10 @@ function Normal(user){
 }
 Util.inherits(Normal,Base);
 Normal.prototype.action={
-	'channel_list': function(){
+	'channel_list': function(data,list){
 		this.user.send({
 			'action': 'channel_list',
-			'list': Channel.list().reduce(function(list,channel){
-				list.push({'id':channel.id,'name':channel.name})
-				return list;
-			},[])
+			'list': list? list:Base.makeChannelList()
 		})
 	},
 	'channel_switch': function(data){
