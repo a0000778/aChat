@@ -5,6 +5,10 @@ Base.prototype.exec=function(data){
 		data=JSON.parse(data.utf8Data);
 	}catch(e){ return; }
 	if(typeof(data.action)==='string' && this.action.hasOwnProperty(data.action))
+		this.action[data.action].call(this,data);
+}
+Base.prototype._exec=function(data){
+	if(typeof(data.action)==='string' && this.action.hasOwnProperty(data.action))
 		this.action[data.action].apply(this,arguments);
 }
 
