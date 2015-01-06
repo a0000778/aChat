@@ -11,7 +11,7 @@ function Admin(user){
 	
 }
 Util.inherits(Admin,Base);
-Admin.action={
+Admin.prototype.action={
 	'channel_create': function(data){
 		if(data.hasOwnProperty('name') && data.name.length>0){
 			var _=this;

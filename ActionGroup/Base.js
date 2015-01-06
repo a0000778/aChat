@@ -4,8 +4,8 @@ Base.prototype.exec=function(data){
 	try{
 		data=JSON.parse(data.utf8Data);
 	}catch(e){ return; }
-	if(typeof(data.action)==='string' && this.constructor.action.hasOwnProperty(data.action))
-		this.constructor.action[data.action].apply(this,arguments);
+	if(typeof(data.action)==='string' && this.action.hasOwnProperty(data.action))
+		this.action[data.action].apply(this,arguments);
 }
 
 module.exports=Base;

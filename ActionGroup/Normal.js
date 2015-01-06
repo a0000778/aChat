@@ -9,7 +9,7 @@ function Normal(user){
 	this.user=user;
 }
 Util.inherits(Normal,Base);
-Normal.action={
+Normal.prototype.action={
 	'channel_list': function(){
 		this.user.send({
 			'action': 'channel_list',
