@@ -3,6 +3,7 @@ var Config=require('./Config.js');
 function Channel(id,name){
 	this.id=id;
 	this.name=name;
+	this.lock=false;
 	this.onlineList=[];
 	this.onlineMax=Config.channelUserMax;
 	Channel.channelIndexId.push(this.id);
@@ -43,7 +44,7 @@ Channel.prototype.exit=function(user){
 }
 Channel.prototype.join=function(user,force){
 	if(this.onlineList.indexOf(user)>=0) return true;
-	if(this.onlineMax<=this.onlineList.length && !force) return false;
+	if((this.onlineMax<=this.onlineList.length || this.lock) && !force) return false;
 	if(user.channel) user.channel.exit(user);
 	this.send({
 		'action': 'chat_alert_channelJoin',
