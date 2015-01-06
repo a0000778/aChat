@@ -5,7 +5,7 @@ Base.prototype.exec=function(data){
 		data=JSON.parse(data.utf8Data);
 	}catch(e){ return; }
 	if(typeof(data.action)==='string' && this.constructor.action.hasOwnProperty(data.action))
-		this.constructor.action[data.action].call(this,data);
+		this.constructor.action[data.action].apply(this,arguments);
 }
 
 module.exports=Base;
