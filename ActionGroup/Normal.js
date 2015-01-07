@@ -83,7 +83,7 @@ Normal.prototype.action={
 			var sendData=JSON.stringify({
 				'action': 'chat_private',
 				'fromUserId': this.user.id,
-				'toUserId': data.toUserId
+				'toUserId': data.toUserId,
 				'msg': data.msg
 			});
 			target.send(sendData);
