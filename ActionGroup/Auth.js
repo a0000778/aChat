@@ -29,10 +29,10 @@ Auth.prototype.action={
 			if(result===0){
 				_.user.exit(4003);
 				return;
+			}else if(result===-3){
+				_.user.exit(4101);
 			}else if(result<0){
 				_.user.exit(4102);
-			}else if(!result.action){
-				_.user.exit(4101);
 			}else if(User.findById(result.id)){
 				this.user.exit(4103);
 			}else{
