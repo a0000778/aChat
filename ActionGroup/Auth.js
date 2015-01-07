@@ -7,6 +7,7 @@ var User=require('../User.js');
 
 /* 驗證身份指令組 */
 function Auth(user){
+	this.authing=false;
 	this.user=user;
 	this.timeout=setTimeout(Auth.timeout,10000,user);
 }
@@ -20,7 +21,7 @@ Auth.timeout=function(user){
 }
 Auth.prototype.action={
 	'auth': function(data){
-		if(!data.username){
+		if(!data.username || this.authing){
 			return;
 		}
 		var _=this;
