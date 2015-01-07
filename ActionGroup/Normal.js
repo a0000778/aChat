@@ -114,7 +114,7 @@ Normal.prototype.action={
 	'user_editProfile': function(data){
 		if(!data.hasOwnProperty('password')){
 			this.user.send({
-				'action': 'user_getProfile',
+				'action': 'user_editProfile',
 				'status': 'fail'
 			});
 			return;
