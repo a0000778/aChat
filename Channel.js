@@ -43,8 +43,9 @@ Channel.prototype.exit=function(user){
 	return true;
 }
 Channel.prototype.join=function(user,force){
+	if(this.lock) return false;
 	if(this.onlineList.indexOf(user)>=0) return true;
-	if((this.onlineMax<=this.onlineList.length || this.lock) && !force) return false;
+	if(this.onlineMax<=this.onlineList.length && !force) return false;
 	if(user.channel) user.channel.exit(user);
 	this.send({
 		'action': 'chat_alert_channelJoin',
