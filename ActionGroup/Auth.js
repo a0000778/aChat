@@ -36,7 +36,7 @@ Auth.prototype.action={
 			}else if(User.findById(result.id)){
 				this.user.exit(4103);
 			}else{
-				_.user.id=result.id;
+				_.user.updateId(result.id);
 				_.user.username=result.username;
 				_.user.actionGroup=new Normal(_.user);
 				_.user.send({
