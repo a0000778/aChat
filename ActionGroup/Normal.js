@@ -41,10 +41,25 @@ Normal.prototype.action={
 			});
 		}
 	},
-	'channel_userList': function(){
+	'channel_userList': function(data,list){
+		if(data.hasOwnProperty('channelId')){
+			if(!/^\d+$/.test(data.channelId) && data.channelId<=0){
+				var channel=Channel.findById(data.channelId);
+				if(!channel){
+					this.user.send({
+						'action': 'channel_userList',
+						'status': 'not exists'
+					});
+					return;
+				}
+			}else return;
+		}else{
+			var channel=this.user.channel;
+		}
 		this.user.send({
 			'action': 'channel_userList',
-			'list': this.user.channel.onlineList.reduce(function(list,user){
+			'status': 'success',
+			'list': list? list:channel.onlineList.reduce(function(list,user){
 				list.push({'id':user.id,'username':user.username});
 				return list;
 			},[])
