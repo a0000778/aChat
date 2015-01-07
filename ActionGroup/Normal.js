@@ -17,27 +17,27 @@ Normal.prototype.action={
 		})
 	},
 	'channel_switch': function(data){
-		if(!/^\d+$/.test(data.id) || data.id<=0) return;
-		var channel=Channel.findById(data.id);
+		if(!/^\d+$/.test(data.channelId) || data.channelId<=0) return;
+		var channel=Channel.findById(data.channelId);
 		if(channel){
 			if(channel.join(this.user)){
 				this.user.send({
 					'action': 'channel_switch',
 					'status': 'success',
-					'channelId': data.id 
+					'channelId': data.channelId
 				});
 			}else{
 				this.user.send({
 					'action': 'channel_switch',
 					'status': 'full',
-					'channelId': data.id 
+					'channelId': data.channelId
 				});
 			}
 		}else{
 			this.user.send({
 				'action': 'channel_switch',
 				'status': 'not exists',
-				'channelId': data.id 
+				'channelId': data.channelId
 			});
 		}
 	},
@@ -70,27 +70,30 @@ Normal.prototype.action={
 		if(!this.user.channel) return;
 		this.user.channel.send({
 			'action': 'chat_normal',
-			'userId': this.user.id,
+			'fromUserId': this.user.id,
 			'msg': data.msg
 		});
 		DB.writeChatLog(0,this.user.channel.id,this.user.id,null,data.msg);
 	},
 	'chat_private': function(data){
-		if(!/^\d+$/.test(data.id) || data.id<=0) return;
+		if(!/^\d+$/.test(data.toUserId) || data.toUserId<=0) return;
 		if(!data.msg || typeof(data.msg)!='string' || !data.msg.length) return;
-		var target=User.findById(data.id);
+		var target=User.findById(data.toUserId);
 		if(target){
-			target.send({
+			var sendData=JSON.stringify({
 				'action': 'chat_private',
-				'fromid': this.user.id,
+				'fromUserId': this.user.id,
+				'toUserId': data.toUserId
 				'msg': data.msg
 			});
+			target.send(sendData);
+			this.user.send(sendData);
 			DB.writeChatLog(1,null,this.user.id,target.id,data.msg);
 		}else{
 			this.user.send({
 				'action': 'chat_private_fail',
 				'status': 'offline or not exists',
-				'toid': data.id
+				'toUserId': data.toUserId
 			});
 		}
 	},
@@ -133,7 +136,7 @@ Normal.prototype.action={
 					'status': 'success'
 				});
 			}
-		})
+		});
 	},
 	'user_logout': function(data){
 		this.user.exit();

@@ -3,7 +3,7 @@ var Channel=require('../Channel.js');
 function Base(){}
 Base.makeChannelList=function(){
 	return Channel.list().reduce(function(list,channel){
-		list.push({'id':channel.id,'name':channel.name})
+		list.push({'channelId':channel.id,'name':channel.name})
 		return list;
 	},[]);
 }

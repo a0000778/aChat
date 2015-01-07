@@ -88,7 +88,7 @@ function mountOutput(link,account){
 				case 'channel_list':
 					link.sendUTF(JSON.stringify({
 						'action':'channel_switch',
-						'id': msg.list[Math.floor(Math.random()*msg.list.length)].id
+						'channelId': msg.list[Math.floor(Math.random()*msg.list.length)].channelId
 					}));
 				break;
 				case 'channel_switch':
