@@ -120,6 +120,7 @@ Normal.prototype.action={
 			return;
 		}
 		var _=this;
+		data.action=undefined;
 		this.user.profile(data,function(error,result){
 			if(error || !result){
 				_.user.send({
