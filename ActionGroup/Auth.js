@@ -17,7 +17,7 @@ Auth.prototype.umount=function(){
 	this.user=null; 
 }
 Auth.timeout=function(user){
-	user.exit(4000);
+	user.exit(4100);
 }
 Auth.prototype.action={
 	'auth': function(data){
