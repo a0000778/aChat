@@ -1,6 +1,7 @@
 module.exports={
 	'debug': true,					//除錯訊息輸出
 	'port': 8080,					//伺服器監聽 port
+	'ssl': false,					//SSL連線，設定項參考 http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener
 	
 	'userMax': 1000,				//全服最大在線人數
 	'userPasswordHash': 'sha256',	//密碼 hash 方法，更改後必須連同資料庫欄位長度一同更改

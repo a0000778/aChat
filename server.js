@@ -3,7 +3,7 @@
 處理使用者的請求
 */
 var Http=require('http');
-var https=require('https');
+var Https=require('https');
 var WebSocket=require('websocket');
 var Channel=require('./Channel.js');
 var Config=require('./Config.js')
@@ -15,7 +15,10 @@ console.log('aChat v2.0.0 by a0000778');
 console.log('MIT Licence');
 
 var serverLock=false;
-var web=Http.createServer();
+if(Config.ssl)
+	var web=Https.createServer(Config.ssl);
+else
+	var web=Http.createServer();
 var socket=new WebSocket.server();
 
 web.on('close',function(){
