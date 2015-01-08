@@ -50,16 +50,19 @@
 切換頻道後，返回以下指令。
 * `action` (String) channel_switch
 * `status` (String) success
+* `channelId` (Number) 目標頻道ID
 
 ##### 切換失敗 - 人數已滿
 返回以下指令。
 * `action` (String) channel_switch
 * `status` (String) full
+* `channelId` (Number) 目標頻道ID
 
 ##### 切換失敗 - 頻道不存在
 返回以下指令。
 * `action` (String) channel_switch
 * `status` (String) not exists
+* `channelId` (Number) 目標頻道ID
 
 ### channel_userList
 返回指定頻道在線列表。
