@@ -19,7 +19,7 @@ setInterval(function(){
 
 sqlFile
 	.on('open',function(){
-		sqlFile.write('INSERT INTO `user` (`username`,`password`,`salt`,`email`,`action`,`regTime`) VALUES \n', 'utf8');
+		sqlFile.write('INSERT INTO `user` (`username`,`password`,`salt`,`email`,`active`,`regTime`) VALUES \n', 'utf8');
 		waiting--;
 		startGen();
 	})

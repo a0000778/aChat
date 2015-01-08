@@ -62,8 +62,10 @@ User.auth=function(username,password,callback){
 			return;
 		}
 		result=result[0];
-		if(result.password==passwordHash(password,result.salt))
-			setImmediate(callback,result);
+		if(result.password==passwordHash(password,result.salt)){
+			if(result.active) setImmediate(callback,result);
+			else setImmediate(callback,-3);
+		}
 	});
 }
 /*
@@ -103,7 +105,7 @@ User.register=function(username,password,email,callback){
 				'password': password,
 				'salt': salt,
 				'email': email,
-				'action': true,
+				'active': true,
 				'regTime': Math.floor(new Date().getTime()/1000)
 			},
 			function(error,result){
