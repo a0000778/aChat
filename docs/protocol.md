@@ -17,6 +17,7 @@
 返回以下指令後，移動至預設頻道，轉送 Normal 指令集。
 * `action` (String) auth
 * `status` (String) success
+* `userId` (Number) 帳號ID
 
 ##### 驗證成功 - 重複登入
 以狀態碼 `4103` 斷線處理。

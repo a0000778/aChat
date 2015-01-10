@@ -41,7 +41,8 @@ Auth.prototype.action={
 				_.user.actionGroup=new Normal(_.user);
 				_.user.send({
 					'action': 'auth',
-					'status': 'success'
+					'status': 'success',
+					'userId': result.id
 				});
 				Channel.findById(Config.channelDefault).join(_.user,true);//進入預設頻道，無視頻道人數上限
 				_.umount();
