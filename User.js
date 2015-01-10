@@ -49,22 +49,22 @@ User.userList=[];
 */
 User.auth=function(username,password,callback){
 	if(!username.length || username.length>usernameMaxLength || controlChars.test(username)){
-		setImmediate(callback,-1); return;
+		callback(-1); return;
 	}
 	DB.getUserInfoByUsername(username,function(error,result){
 		if(error){
 			console.error(error);
-			setImmediate(callback,0);
+			callback(0);
 			return;
 		}
 		if(!result.length){
-			setImmediate(callback,-2);
+			callback(-2);
 			return;
 		}
 		result=result[0];
 		if(result.password==passwordHash(password,result.salt)){
-			if(result.active) setImmediate(callback,result);
-			else setImmediate(callback,-3);
+			if(result.active) callback(result);
+			else callback(-3);
 		}
 	});
 }
@@ -78,24 +78,24 @@ User.auth=function(username,password,callback){
 */
 User.register=function(username,password,email,callback){
 	if(!username.length || username.length>usernameMaxLength || controlChars.test(username)){
-		setImmediate(callback,-1);
+		callback(-1);
 		return;
 	}
 	if(!profileFieldCheck.email.test(email)){
-		setImmediate(callback,-2);
+		callback(-2);
 		return;
 	}
 	if(!profileFieldCheck.password.test(password)){
-		setImmediate(callback,-3);
+		callback(-3);
 		return;
 	}
 	DB.getUserInfoByUsername(username,function(error,result){
 		if(error){
 			console.error(error);
-			setImmediate(callback,0); return;
+			callback(0); return;
 		}
 		if(result.length){
-			setImmediate(callback,-4); return;
+			callback(-4); return;
 		}
 		var salt=genSalt();
 		var password=passwordHash(password,salt);
@@ -110,7 +110,7 @@ User.register=function(username,password,email,callback){
 			},
 			function(error,result){
 				if(error) console.error(error);
-				setImmediate(callback,error? 0:result.insertId);
+				callback(error? 0:result.insertId);
 			}
 		);
 	})
@@ -144,12 +144,12 @@ User.prototype.profile=function(data,callback){
 	if(data){//待補上修改E-mail後重新驗證
 		User.auth(this.username,data.password,function(result){
 			if(!result || result<0){
-				setImmediate(callback,null,false);
+				callback(null,false);
 				return;
 			}
 			for(var field in data){
 				if(!profileFieldCheck.hasOwnProperty(field) || !profileFieldCheck[field].test(data[field])){
-					setImmediate(callback,null,false);
+					callback(null,false);
 				}
 			}
 			if(data.hasOwnProperty('newPassword')){
@@ -165,20 +165,20 @@ User.prototype.profile=function(data,callback){
 				data,
 				function(error,result){
 					if(error)
-						setImmediate(callback,true,false);
+						callback(true,false);
 					else
-						setImmediate(callback,null,true);
+						callback(null,true);
 				}
 			);
 		});
 	}else{
 		DB.getUserInfoById(this.id,function(error,result){
 			if(error){
-				setImmediate(callback,true,null);
+				callback(true,null);
 				return;
 			}
 			result.password=result.salt=result.action=undefined;
-			setImmediate(callback,result[0]);
+			callback(result[0]);
 		});
 	}
 }
