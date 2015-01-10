@@ -1,6 +1,13 @@
+/*
+壓力測試腳本
+node test_client [minOnlineUser=200 [maxOnlineUser=1000]]
+*/
 var WSClient=require('websocket').client;
 var Account=require('./test_account.js');
-const startCount=5000;//測試次數
+const startCount=5000;//連線次數
+const connectInterval=70;//連線間隔
+var minOnlineTime=connectInterval*(process.argv[2] || 200);//最短在線時間(由最小在線人數產生)
+var maxOnlineTime=connectInterval*((process.argv[3] || 1000)-(process.argv[2] || 200));//最長在線時間(由最大在線人數產生)
 
 var clientList=[];
 var connectStart=0;
@@ -14,7 +21,7 @@ var autoConnect=setInterval(function(){
 	if(clientList.length<startCount) return;
 	console.log('已發起 %d 次連線，等待自動登出',startCount);
 	clearInterval(autoConnect);
-},70);
+},connectInterval);
 var monitor=setInterval(function(){
 	console.log(
 		'連線: %d, 收到: %d, 送出: %d, 發起: %d, 成功: %d, 失敗: %d, 關閉: %d',
@@ -122,5 +129,5 @@ function mountOutput(link,account){
 			link.sendUTF(JSON.stringify({
 				'action': 'user_logout'
 			}));
-	},Math.floor(Math.random()*10000)+20000);
+	},Math.floor(Math.random()*maxOnlineTime)+minOnlineTime);
 }
