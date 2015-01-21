@@ -60,9 +60,8 @@ var DB={};
 	var writingCount=0;
 	var writeTTL=setTimeout(DB.writeChatLogNow,Config.chatLogCacheTTL);
 	
-	DB.writeChatLog=function(type,channel,fromid,toid,msg){
+	DB.writeChatLog=function(time,type,channel,fromid,toid,msg){
 		var at=0;
-		var time=Math.floor(new Date().getTime()/1000);
 		while(at<msg.length){
 			chatLogCache.push([time,type,channel,fromid,toid,msg.substr(at,255)]);
 			at+=255;

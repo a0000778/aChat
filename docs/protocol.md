@@ -96,6 +96,7 @@
 * `action` (String) chat_normal
 * `fromUserId` (Number) 發言者ID
 * `msg` (String) 訊息內容
+* `time` (Number) 發送時間 (Unix Time)
 
 ##### 失敗
 無回應。
@@ -113,6 +114,7 @@
 * `fromUserId` (Number) 發言者ID
 * `toUserId` (Number) 目標使用者ID
 * `msg` (String) 訊息內容
+* `time` (Number) 發送時間 (Unix Time)
 
 ##### 失敗 - 目標不在線
 發送方收到以下格式的訊息。

@@ -68,27 +68,31 @@ Normal.prototype.action={
 	'chat_normal': function(data){
 		if(!data.msg || typeof(data.msg)!='string' || !data.msg.length) return;
 		if(!this.user.channel) return;
+		var time=Math.floor(new Date().getTime()/1000);
 		this.user.channel.send({
 			'action': 'chat_normal',
 			'fromUserId': this.user.id,
-			'msg': data.msg
+			'msg': data.msg,
+			'time': time
 		});
-		DB.writeChatLog(0,this.user.channel.id,this.user.id,null,data.msg);
+		DB.writeChatLog(time,0,this.user.channel.id,this.user.id,null,data.msg);
 	},
 	'chat_private': function(data){
 		if(!/^\d+$/.test(data.toUserId) || data.toUserId<=0) return;
 		if(!data.msg || typeof(data.msg)!='string' || !data.msg.length) return;
 		var target=User.findById(data.toUserId);
 		if(target){
+			var time=Math.floor(new Date().getTime()/1000);
 			var sendData=JSON.stringify({
 				'action': 'chat_private',
 				'fromUserId': this.user.id,
 				'toUserId': data.toUserId,
-				'msg': data.msg
+				'msg': data.msg,
+				'time': time
 			});
 			target.send(sendData);
 			this.user.send(sendData);
-			DB.writeChatLog(1,null,this.user.id,target.id,data.msg);
+			DB.writeChatLog(time,1,null,this.user.id,target.id,data.msg);
 		}else{
 			this.user.send({
 				'action': 'chat_private_fail',
