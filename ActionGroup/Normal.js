@@ -41,7 +41,7 @@ Normal.prototype.action={
 			});
 		}
 	},
-	'channel_userList': function(data,list){
+	'channel_userList': function(data,channelId,list){
 		if(data.hasOwnProperty('channelId')){
 			if(!/^\d+$/.test(data.channelId) && data.channelId<=0){
 				var channel=Channel.findById(data.channelId);
@@ -59,7 +59,8 @@ Normal.prototype.action={
 		this.user.send({
 			'action': 'channel_userList',
 			'status': 'success',
-			'list': list? list:channel.onlineList.reduce(function(list,user){
+			'channelId': channelId || channel.id,
+			'userList': list || channel.onlineList.reduce(function(list,user){
 				list.push({'id':user.id,'username':user.username});
 				return list;
 			},[])
