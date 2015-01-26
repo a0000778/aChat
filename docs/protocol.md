@@ -75,6 +75,7 @@
 按以下格式返回在線列表。
 * `action` (String) channel_userList
 * `status` (String) success
+* `channelId` (Number) 請求的頻道ID
 * `list` (Array)
 	* (Object) 使用者
 		* `id` (Number) 使用者ID
