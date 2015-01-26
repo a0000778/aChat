@@ -65,7 +65,8 @@ User.auth=function(username,password,callback){
 		if(result.password==passwordHash(password,result.salt)){
 			if(result.active) callback(result);
 			else callback(-3);
-		}
+		}else
+			callback(-2);
 	});
 }
 /*
