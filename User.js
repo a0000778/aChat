@@ -137,8 +137,10 @@ User.prototype.exit=function(code){
 	if(this.link.connected) this.link.close(code);
 	if(this.channel) this.channel.exit(this);
 	var index=User.userList.indexOf(this);
-	if(index>=0)
+	if(index>=0){
+		User.userIndexId.splice(index,1);
 		User.userList.splice(index,1);
+	}
 	return true;
 }
 User.prototype.profile=function(data,callback){
