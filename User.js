@@ -181,7 +181,7 @@ User.prototype.profile=function(data,callback){
 				return;
 			}
 			result.password=result.salt=result.action=undefined;
-			callback(result[0]);
+			callback(null,result[0]);
 		});
 	}
 }
