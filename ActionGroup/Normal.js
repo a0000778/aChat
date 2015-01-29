@@ -103,21 +103,50 @@ Normal.prototype.action={
 		}
 	},
 	'user_getProfile': function(data){
-		var _=this;
-		this.user.profile(null,function(error,result){
-			if(error || !result){
-				_.user.send({
-					'action': 'user_getProfile',
-					'status': 'fail'
-				});
-			}else{
-				_.user.send({
-					'action': 'user_getProfile',
-					'status': 'success',
-					'profile': result
-				});
-			}
-		});
+		if(Array.isArray(data.userIds) && data.userIds.reduce(function(result,userId){
+			return result && /^\d+$/.test(userId)
+		},true)){
+			var _=this;
+			data.userIds.forEach(function(userId){
+				if(userId===this.user.id){
+					this.user.profile(null,function(error,result){
+						if(error || !result){
+							_.user.send({
+								'action': 'user_getProfile',
+								'status': 'fail',
+								'profile': {'id': _.user.id}
+							});
+						}else{
+							_.user.send({
+								'action': 'user_getProfile',
+								'status': 'success',
+								'profile': result
+							});
+						}
+					});
+				}else{
+					var user=User.findById(userId);
+					if(user){
+						_.user.send({
+							'action': 'user_getProfile',
+							'status': 'success',
+							'profile': {
+								'userId': user.id,
+								'username': username
+							}
+						});
+					}else{
+						_.user.send({
+							'action': 'user_getProfile',
+							'status': 'offline',
+							'profile': {
+								'userId': userId,
+							}
+						});
+					}
+				}
+			},this);
+		}
 	},
 	'user_editProfile': function(data){
 		if(!data.hasOwnProperty('password')){
