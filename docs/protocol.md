@@ -39,7 +39,7 @@
 * `list` (Array)
 	* (Object) 頻道資訊
 		* `channelId` (Number) 頻道ID
-		* `Name` (String) 頻道名稱
+		* `name` (String) 頻道名稱
 
 ### channel_switch
 頻道切換。
