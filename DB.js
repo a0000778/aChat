@@ -50,7 +50,7 @@ var DB={};
 		pool.query('SELECT * FROM `user` WHERE `username`=?',[username],callback);
 	}
 	DB.updateUserInfo=function(id,info,callback){
-		pool.query('UPDATE `user` SET ? WHERE `id`=?;',[info],callback);
+		pool.query('UPDATE `user` SET ? WHERE `id`=?;',[info,id],callback);
 	}
 })(DB);
 
