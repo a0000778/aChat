@@ -153,6 +153,7 @@ User.prototype.profile=function(data,callback){
 			for(var field in data){
 				if(!profileFieldCheck.hasOwnProperty(field) || !profileFieldCheck[field].test(data[field])){
 					callback(null,false);
+					return;
 				}
 			}
 			if(data.hasOwnProperty('newPassword')){
