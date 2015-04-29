@@ -144,6 +144,7 @@ User.prototype.exit=function(code){
 	return true;
 }
 User.prototype.profile=function(data,callback){
+	var _=this;
 	if(data){//待補上修改E-mail後重新驗證
 		User.auth(this.username,data.password,function(result){
 			if(!result || result<0){
@@ -160,12 +161,12 @@ User.prototype.profile=function(data,callback){
 				var salt=getSalt();
 				data.password=passwordHash(data.newPassword,salt);
 				data.salt=salt;
-				data.newPassword=undefined;
+				delete data.newPassword;
 			}else{
-				data.password=undefined;
+				delete data.password;
 			}
 			DB.updateUserInfo(
-				this.id,
+				_.id,
 				data,
 				function(error,result){
 					if(error)

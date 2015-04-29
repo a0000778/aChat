@@ -157,7 +157,7 @@ Normal.prototype.action={
 			return;
 		}
 		var _=this;
-		data.action=undefined;
+		delete data.action;
 		this.user.profile(data,function(error,result){
 			if(error || !result){
 				_.user.send({
