@@ -132,7 +132,7 @@ Normal.prototype.action={
 							'status': 'success',
 							'profile': {
 								'userId': user.id,
-								'username': username
+								'username': user.username
 							}
 						});
 					}else{
