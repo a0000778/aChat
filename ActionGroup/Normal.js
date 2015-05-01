@@ -114,7 +114,7 @@ Normal.prototype.action={
 							_.user.send({
 								'action': 'user_getProfile',
 								'status': 'fail',
-								'profile': {'id': _.user.id}
+								'profile': {'userId': _.user.id}
 							});
 						}else{
 							_.user.send({

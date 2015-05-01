@@ -134,7 +134,7 @@
 * `action` (String) user_getProfile
 * `status` (String) success
 * `profile` (Object)
-	* `id` (Number) 使用者ID
+	* `userId` (Number) 使用者ID
 	* `username` (String) 帳號
 	* `regTime` (Number) 註冊時間的 Unix Time
 
@@ -142,6 +142,8 @@
 返回以下格式資料
 * `action` (String) user_getProfile
 * `status` (String) fail
+* `profile` (Object)
+	* `userId` (Number) 使用者ID
 
 ### user_editProfile
 修改自己的使用者資料
