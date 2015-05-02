@@ -33,16 +33,16 @@ Auth.prototype.action={
 				_.user.exit(4101);
 			}else if(result<0){
 				_.user.exit(4102);
-			}else if(User.findById(result.id)){
+			}else if(User.findById(result.userId)){
 				_.user.exit(4103);
 			}else{
-				_.user.updateId(result.id);
+				_.user.updateId(result.userId);
 				_.user.username=result.username;
 				_.user.actionGroup=new Normal(_.user);
 				_.user.send({
 					'action': 'auth',
 					'status': 'success',
-					'userId': result.id
+					'userId': result.userId
 				});
 				Channel.findById(Config.channelDefault).join(_.user,true);//進入預設頻道，無視頻道人數上限
 				_.user.send({

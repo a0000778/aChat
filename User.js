@@ -16,7 +16,7 @@ const saltLength=8;//salt 長度
 const saltChar='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`-=[];’,./~!@#$%^&*()_+{}|:”<>?\\';//salt 字元
 
 function User(link){
-	this.id=null;
+	this.userId=null;
 	this.username=null;
 	this.link=link;
 	this.channel=null;
@@ -36,9 +36,9 @@ function User(link){
 	;
 	
 	User.userList.push(this);
-	User.userIndexId.push(this.id);
+	User.userIndex_userId.push(this.userId);
 }
-User.userIndexId=[];
+User.userIndex_userId=[];
 User.userList=[];
 /*
 	成功，返回userData
@@ -116,8 +116,8 @@ User.register=function(username,password,email,callback){
 		);
 	})
 }
-User.findById=function(id){
-	var index=this.userIndexId.indexOf(id);
+User.findById=function(userId){
+	var index=this.userIndex_userId.indexOf(userId);
 	return index>=0? this.userList[index]:null;
 }
 User.send=function(data){
@@ -138,7 +138,7 @@ User.prototype.exit=function(code){
 	if(this.channel) this.channel.exit(this);
 	var index=User.userList.indexOf(this);
 	if(index>=0){
-		User.userIndexId.splice(index,1);
+		User.userIndex_userId.splice(index,1);
 		User.userList.splice(index,1);
 	}
 	return true;
@@ -166,7 +166,7 @@ User.prototype.profile=function(data,callback){
 				delete data.password;
 			}
 			DB.updateUserInfo(
-				_.id,
+				_.userId,
 				data,
 				function(error,result){
 					if(error)
@@ -177,7 +177,7 @@ User.prototype.profile=function(data,callback){
 			);
 		});
 	}else{
-		DB.getUserInfoById(this.id,function(error,result){
+		DB.getUserInfoById(this.userId,function(error,result){
 			if(error){
 				callback(true,null);
 				return;
@@ -195,9 +195,9 @@ User.prototype.send=function(data){
 		this.link.sendUTF(typeof(data)==='string'? data:JSON.stringify(data));
 	return true;
 }
-User.prototype.updateId=function(id){
-	this.id=id;
-	User.userIndexId[User.userList.indexOf(this)]=id;
+User.prototype.updateId=function(userId){
+	this.userId=userId;
+	User.userIndex_userId[User.userList.indexOf(this)]=userId;
 }
 
 function passwordHash(password,salt){

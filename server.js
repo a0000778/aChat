@@ -54,7 +54,7 @@ DB.getAllChannel(function(error,result){
 		process.exit();
 	}
 	result.forEach(function(channel){
-		new Channel(channel.id,channel.name);
+		new Channel(channel.channelId,channel.name);
 	});
 	if(!Channel.findById(Config.channelDefault)){
 		console.log('預設頻道不存在！');

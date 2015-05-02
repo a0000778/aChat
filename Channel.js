@@ -1,18 +1,18 @@
 var Config=require('./Config.js');
 
-function Channel(id,name){
-	this.id=id;
+function Channel(channelId,name){
+	this.channelId=channelId;
 	this.name=name;
 	this.lock=false;
 	this.onlineList=[];
 	this.onlineMax=Config.channelUserMax;
-	Channel.channelIndexId.push(this.id);
+	Channel.channelIndex_channelId.push(this.channelId);
 	Channel.channelList.push(this);
 }
-Channel.channelIndexId=[];
+Channel.channelIndex_channelId=[];
 Channel.channelList=[];
-Channel.findById=function(id){
-	var index=this.channelIndexId.indexOf(id);
+Channel.findById=function(channelId){
+	var index=this.channelIndex_channelId.indexOf(channelId);
 	return index>=0? this.channelList[index]:null;
 }
 Channel.list=function(){
@@ -35,8 +35,8 @@ Channel.prototype.exit=function(user){
 		this.onlineList.splice(index,1);
 		user.channel=null;
 		this.send({
-			'action': 'chat_alert_channelExit',
-			'userId': user.id,
+			'action': 'channel_exit',
+			'userId': user.userId,
 			'username': user.username
 		});
 	}
@@ -48,8 +48,8 @@ Channel.prototype.join=function(user,force){
 	if(this.onlineMax<=this.onlineList.length && !force) return false;
 	if(user.channel) user.channel.exit(user);
 	this.send({
-		'action': 'chat_alert_channelJoin',
-		'userId': user.id,
+		'action': 'channel_join',
+		'userId': user.userId,
 		'username': user.username
 	});
 	this.onlineList.push(user);

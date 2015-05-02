@@ -53,8 +53,8 @@ Admin.prototype.action={
 		}
 	},
 	'channel_edit': function(data){
-		if(data.hasOwnProperty('id') && /^\d+$/.test(data.id) && data.id>0){
-			var channel=Channel.findById(data.id);
+		if(data.hasOwnProperty('id') && /^\d+$/.test(data.channelId) && data.id>0){
+			var channel=Channel.findById(data.channelId);
 			if(channel){
 				var _=this;
 				var hasEditData=false;
@@ -66,7 +66,7 @@ Admin.prototype.action={
 				},{});
 				if(hasEditData){
 					DB.editChannel(
-						data.id,
+						data.channelId,
 						editData,
 						function(error){
 							if(error){
@@ -96,7 +96,7 @@ Admin.prototype.action={
 		}
 	},
 	'channel_delete': function(data){
-		if(data.hasOwnProperty('id') && /^\d+$/.test(data.id) && data.id>0){
+		if(data.hasOwnProperty('id') && /^\d+$/.test(data.channelId) && data.id>0){
 			if(data.id==Config.channelDefault){
 				this.send({
 					'action': 'channel_delete',
@@ -104,7 +104,7 @@ Admin.prototype.action={
 				});
 				return;
 			}
-			var channel=Channel.findById(data.id);
+			var channel=Channel.findById(data.channelId);
 			if(channel){
 				var _=this;
 				var channelDefault=Channel.findById(Config.channelDefault);
@@ -125,7 +125,7 @@ Admin.prototype.action={
 					'channelId': Config.channelDefault
 				});
 				DB.deleteChannel(
-					data.id,
+					data.channelId,
 					function(error){
 							if(error){
 							_.user.send({

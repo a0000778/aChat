@@ -12,11 +12,11 @@ var DB={};
 	DB.createChannel=function(config,callback){
 		pool.query('INSERT INTO `channel` (`name`) VALUES (?);',[[config.name]],callback);
 	}
-	DB.editChannel=function(id,config,callback){
-		pool.query('UPDATE `channel` SET `name`=? WHERE `id`=?;',[config.name,id],callback);
+	DB.editChannel=function(channelId,config,callback){
+		pool.query('UPDATE `channel` SET `name`=? WHERE `channelId`=?;',[config.name,channelId],callback);
 	}
-	DB.deleteChannel=function(id,callback){
-		pool.query('DELETE FROM `channel` WHERE `id`=?;',[id],callback);
+	DB.deleteChannel=function(channelId,callback){
+		pool.query('DELETE FROM `channel` WHERE `channelId`=?;',[channelId],callback);
 	}
 })(DB);
 
@@ -43,14 +43,14 @@ var DB={};
 			callback
 		);
 	}
-	DB.getUserInfoById=function(id,callback){
-		pool.query('SELECT * FROM `user` WHERE `id`=?',[id],callback);
+	DB.getUserInfoById=function(userId,callback){
+		pool.query('SELECT * FROM `user` WHERE `userId`=?',[userId],callback);
 	}
 	DB.getUserInfoByUsername=function(username,callback){
 		pool.query('SELECT * FROM `user` WHERE `username`=?',[username],callback);
 	}
-	DB.updateUserInfo=function(id,info,callback){
-		pool.query('UPDATE `user` SET ? WHERE `id`=?;',[info,id],callback);
+	DB.updateUserInfo=function(userId,info,callback){
+		pool.query('UPDATE `user` SET ? WHERE `userId`=?;',[info,userId],callback);
 	}
 })(DB);
 
@@ -60,10 +60,10 @@ var DB={};
 	var writingCount=0;
 	var writeTTL=setTimeout(DB.writeChatLogNow,Config.chatLogCacheTTL);
 	
-	DB.writeChatLog=function(time,type,channel,fromid,toid,msg){
+	DB.writeChatLog=function(time,type,channelId,fromUserId,toUserId,msg){
 		var at=0;
 		while(at<msg.length){
-			chatLogCache.push([time,type,channel,fromid,toid,msg.substr(at,255)]);
+			chatLogCache.push([time,type,channelId,fromUserId,toUserId,msg.substr(at,255)]);
 			at+=255;
 		}
 		DB.writeChatLogNow();
@@ -76,7 +76,7 @@ var DB={};
 		if(!waitWrite.length) return;
 		writingCount+=waitWrite.length;
 		pool.query(
-			'INSERT INTO `chatlog` (`time`,`type`,`channel`,`fromid`,`toid`,`message`) VALUES ?;',
+			'INSERT INTO `chatlog` (`time`,`type`,`channelId`,`fromUserId`,`toUserId`,`message`) VALUES ?;',
 			[waitWrite],
 			function(error,result){
 				writingCount-=waitWrite.length;

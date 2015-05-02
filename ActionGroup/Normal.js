@@ -61,7 +61,7 @@ Normal.prototype.action={
 			'status': 'success',
 			'channelId': channelId || channel.id,
 			'userList': list || channel.onlineList.reduce(function(list,user){
-				list.push({'id':user.id,'username':user.username});
+				list.push({'userId':user.userId,'username':user.username});
 				return list;
 			},[])
 		});
@@ -72,11 +72,11 @@ Normal.prototype.action={
 		var time=Math.floor(new Date().getTime()/1000);
 		this.user.channel.send({
 			'action': 'chat_normal',
-			'fromUserId': this.user.id,
+			'fromUserId': this.user.userId,
 			'msg': data.msg,
 			'time': time
 		});
-		DB.writeChatLog(time,0,this.user.channel.id,this.user.id,null,data.msg);
+		DB.writeChatLog(time,0,this.user.channel.channelId,this.user.userId,null,data.msg);
 	},
 	'chat_private': function(data){
 		if(!/^\d+$/.test(data.toUserId) || data.toUserId<=0) return;
@@ -86,14 +86,14 @@ Normal.prototype.action={
 			var time=Math.floor(new Date().getTime()/1000);
 			var sendData=JSON.stringify({
 				'action': 'chat_private',
-				'fromUserId': this.user.id,
+				'fromUserId': this.user.userId,
 				'toUserId': data.toUserId,
 				'msg': data.msg,
 				'time': time
 			});
 			target.send(sendData);
 			this.user.send(sendData);
-			DB.writeChatLog(time,1,null,this.user.id,target.id,data.msg);
+			DB.writeChatLog(time,1,null,this.user.userId,target.userId,data.msg);
 		}else{
 			this.user.send({
 				'action': 'chat_private_fail',
@@ -108,13 +108,13 @@ Normal.prototype.action={
 		},true)){
 			var _=this;
 			data.userIds.forEach(function(userId){
-				if(userId===this.user.id){
+				if(userId===this.user.userId){
 					this.user.profile(null,function(error,result){
 						if(error || !result){
 							_.user.send({
 								'action': 'user_getProfile',
 								'status': 'fail',
-								'profile': {'userId': _.user.id}
+								'profile': {'userId': _.user.userId}
 							});
 						}else{
 							_.user.send({
@@ -131,7 +131,7 @@ Normal.prototype.action={
 							'action': 'user_getProfile',
 							'status': 'success',
 							'profile': {
-								'userId': user.id,
+								'userId': user.userId,
 								'username': user.username
 							}
 						});
