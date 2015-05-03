@@ -36,8 +36,7 @@ Channel.prototype.exit=function(user){
 		user.channel=null;
 		this.send({
 			'action': 'channel_exit',
-			'userId': user.userId,
-			'username': user.username
+			'userId': user.userId
 		});
 	}
 	return true;
@@ -49,8 +48,7 @@ Channel.prototype.join=function(user,force){
 	if(user.channel) user.channel.exit(user);
 	this.send({
 		'action': 'channel_join',
-		'userId': user.userId,
-		'username': user.username
+		'userId': user.userId
 	});
 	this.onlineList.push(user);
 	user.channel=this;

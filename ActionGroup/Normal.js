@@ -96,8 +96,8 @@ Normal.prototype.action={
 			DB.writeChatLog(time,1,null,this.user.userId,target.userId,data.msg);
 		}else{
 			this.user.send({
-				'action': 'chat_private_fail',
-				'status': 'offline or not exists',
+				'action': 'chat_private',
+				'error': 'offline or not exists',
 				'toUserId': data.toUserId
 			});
 		}

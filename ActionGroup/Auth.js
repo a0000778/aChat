@@ -47,7 +47,7 @@ Auth.prototype.action={
 				Channel.findById(Config.channelDefault).join(_.user,true);//進入預設頻道，無視頻道人數上限
 				_.user.send({
 					'action': 'channel_switch',
-					'status': 'force',
+					'status': 'default',
 					'channelId': Config.channelDefault
 				});
 				_.umount();
