@@ -5,6 +5,8 @@
 
 ## 返回資訊
 * `OK` 驗證成功
+* `username` 帳號重複(註冊時驗證信箱使用)
+* `email` E-mail重複
 * `not exists` 代碼不存在
 
 # POST /v1/forgotPassword - 忘記密碼
