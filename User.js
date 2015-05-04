@@ -48,7 +48,7 @@ User.userList=[];
 	-3=帳號停用中
 */
 User.auth=function(username,password,callback){
-	if(User.checkInfo({'username': username})){
+	if(User.checkInfoFormat({'username': username})){
 		callback(-1); return;
 	}
 	DB.getUserInfoByUsername(username,function(error,result){
@@ -76,11 +76,11 @@ User.auth=function(username,password,callback){
 	3=密碼不合法
 */
 User.checkInfoFormat=function(info){
-	if(info.hasOwnProperty('username') && (!username.length || username.length>usernameMaxLength || controlChars.test(username)))
+	if(info.hasOwnProperty('username') && (!info.username.length || info.username.length>usernameMaxLength || controlChars.test(info.username)))
 		return 1;
-	if(info.hasOwnProperty('email') && (!profileFieldCheck.email.test(email)))
+	if(info.hasOwnProperty('email') && (!profileFieldCheck.email.test(info.email)))
 		return 2;
-	if(info.hasOwnProperty('password') && (!profileFieldCheck.password.test(password)))
+	if(info.hasOwnProperty('password') && (!profileFieldCheck.password.test(info.password)))
 		return 3;
 }
 /*
@@ -141,7 +141,7 @@ User.resetPassword=function(userId,callback){
 	var salt=genSalt();
 	var password=(Math.floor(Math.random()*Math.pow(36,8))).toString(36);
 	DB.updateUserInfo(userId,{
-		'password': passwordHash(password,salt);
+		'password': passwordHash(password,salt)
 	},function(error,result){
 		if(error){
 			callback(-1);
