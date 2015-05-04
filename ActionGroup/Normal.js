@@ -4,9 +4,13 @@ var Channel=require('../Channel.js');
 var DB=require('../DB.js');
 var User=require('../User.js');
 
+var quota_sendMsg=15;		//限制每20秒發訊息次數，超過限制則懲罰20~40秒內無法發言
+
 /* 一般指令組 */
 function Normal(user){
 	this.user=user;
+	this.quota_sendMsg=quota_sendMsg;
+	this.quotaResetInterval=setInterval(quotaReset,20000);
 }
 Util.inherits(Normal,Base);
 Normal.prototype.action={
@@ -70,6 +74,16 @@ Normal.prototype.action={
 		if(!data.msg || typeof(data.msg)!='string' || !data.msg.length) return;
 		if(!this.user.channel) return;
 		var time=Math.floor(new Date().getTime()/1000);
+		if(!this.quota_sendMsg){
+			this.user.send({
+				'action': 'chat_notice',
+				'msg': '超過每20秒發言頻率上限，請稍候再試。',
+				'time': time
+			});
+			this.quota_sendMsg-=quota_sendMsg;
+			return;
+		}
+		this.quota_sendMsg--;
 		this.user.channel.send({
 			'action': 'chat_normal',
 			'fromUserId': this.user.userId,
@@ -84,6 +98,16 @@ Normal.prototype.action={
 		var target=User.findById(data.toUserId);
 		if(target){
 			var time=Math.floor(new Date().getTime()/1000);
+			if(!this.quota_sendMsg){
+				this.user.send({
+					'action': 'chat_notice',
+					'msg': '超過每20秒發言頻率上限，請稍候再試。',
+					'time': time
+				});
+				this.quota_sendMsg-=quota_sendMsg;
+				return;
+			}
+			this.quota_sendMsg--;
 			var sendData=JSON.stringify({
 				'action': 'chat_private',
 				'fromUserId': this.user.userId,
@@ -181,6 +205,12 @@ Normal.prototype.action={
 	'user_logout': function(data){
 		this.user.exit();
 	}
+}
+Normal.prototype.quotaReset=function(){
+	this.quota_sendMsg=Math.min(this.quota_sendMsg+quota_sendMsg,quota_sendMsg);
+}
+Normal.prototype.umount=function(){
+	clearInterval(this.quotaResetInterval);
 }
 
 module.exports=Normal;
