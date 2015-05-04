@@ -84,6 +84,7 @@
 * `profile` (Object)
 	* `userId` (Number) 使用者ID
 	* `username` (String) 帳號
+	* `email` (String) 信箱(僅查詢目標為自己時)
 	* `regTime` (Number) 註冊時間的 Unix Time
 
 ##### 查詢失敗

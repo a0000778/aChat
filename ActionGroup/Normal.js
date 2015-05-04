@@ -120,7 +120,12 @@ Normal.prototype.action={
 							_.user.send({
 								'action': 'user_getProfile',
 								'status': 'success',
-								'profile': result
+								'profile': {
+									'userId': result.userId,
+									'username': result.username,
+									'email': result.email,
+									'regTime': result.regTime
+								}
 							});
 						}
 					});
@@ -132,7 +137,8 @@ Normal.prototype.action={
 							'status': 'success',
 							'profile': {
 								'userId': user.userId,
-								'username': user.username
+								'username': user.username,
+								'regTime': user.regTime
 							}
 						});
 					}else{
