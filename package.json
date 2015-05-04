@@ -12,5 +12,8 @@
 		"websocket": ">=1.0.14",
 		"mysql": ">=2.5.4"
 	},
+	"engines": {
+		 "node": ">=0.12.2"
+	},
 	"main": "server.js"
 }
