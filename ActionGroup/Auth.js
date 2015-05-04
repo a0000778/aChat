@@ -14,7 +14,7 @@ function Auth(user){
 Util.inherits(Auth,Base);
 Auth.prototype.umount=function(){
 	if(this.timeout) clearTimeout(this.timeout);
-	this.user=null; 
+	this.user=null;
 }
 Auth.timeout=function(user){
 	user.exit(4100);

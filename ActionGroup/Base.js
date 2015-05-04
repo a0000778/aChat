@@ -19,5 +19,6 @@ Base.prototype._exec=function(data){
 	if(typeof(data.action)==='string' && this.action.hasOwnProperty(data.action))
 		this.action[data.action].apply(this,arguments);
 }
+Base.prototype.umount=function(){}
 
 module.exports=Base;
