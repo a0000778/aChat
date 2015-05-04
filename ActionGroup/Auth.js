@@ -1,9 +1,12 @@
 var Util=require('util');
 var Base=require('./Base.js');
-var Normal=require('./Normal.js');
 var Channel=require('../Channel.js');
 var Config=require('../Config.js');
 var User=require('../User.js');
+var ActionGroup;
+setImmediate(function(){//迴避互相依賴
+	ActionGroup=require('../ActionGroup.js');
+});
 
 /* 驗證身份指令組 */
 function Auth(user){
@@ -36,9 +39,17 @@ Auth.prototype.action={
 			}else if(User.findById(result.userId)){
 				_.user.exit(4103);
 			}else{
+				if(_.user.link.protocol=='adminv1' && result.actionGroup!='Admin'){
+					_.user.exit(4102);
+					return;
+				}
+				if(!ActionGroup.hasOwnProperty(result.actionGroup)){
+					_.user.exit(4003);
+					return;
+				}
 				_.user.updateId(result.userId);
 				_.user.username=result.username;
-				_.user.actionGroup=new Normal(_.user);
+				_.user.actionGroup=new ActionGroup[result.actionGroup](_.user);
 				_.user.send({
 					'action': 'auth',
 					'status': 'success',

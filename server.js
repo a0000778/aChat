@@ -1,7 +1,3 @@
-/*
-聊天室子程序
-處理使用者的請求
-*/
 var Http=require('http');
 var Https=require('https');
 var WebSocket=require('websocket');
@@ -31,7 +27,7 @@ socket.mount({
 
 socket.on('request',function(req){
 	if(req.requestedProtocols.indexOf('adminv1')>=0){
-		//轉接至管理指令
+		new User(req.accept('adminv1',req.origin));
 		return;
 	}
 	if(serverLock){
