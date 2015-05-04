@@ -53,7 +53,7 @@ Admin.prototype.action={
 		}
 	},
 	'channel_edit': function(data){
-		if(data.hasOwnProperty('id') && /^\d+$/.test(data.channelId) && data.id>0){
+		if(data.hasOwnProperty('channelId') && /^\d+$/.test(data.channelId) && data.channelId>0){
 			var channel=Channel.findById(data.channelId);
 			if(channel){
 				var _=this;
@@ -96,11 +96,11 @@ Admin.prototype.action={
 		}
 	},
 	'channel_delete': function(data){
-		if(data.hasOwnProperty('id') && /^\d+$/.test(data.channelId) && data.id>0){
-			if(data.id==Config.channelDefault){
+		if(data.hasOwnProperty('channelId') && /^\d+$/.test(data.channelId) && data.channelId>0){
+			if(data.channelId==Config.channelDefault){
 				this.send({
 					'action': 'channel_delete',
-					'status': 'is default channel'
+					'status': 'default channel'
 				});
 				return;
 			}
@@ -220,53 +220,57 @@ Admin.prototype.action={
 						});
 						return;
 					}
+					_.user.send({
+						'action': 'user_unban',
+						'status': 'success'
+					});
 				}
 			);
 		}
 	},
-	'server_alert': function(data){
+	'chat_global': function(data){
 		if(data.hasOwnProperty('msg') && !data.msg.length) return;
 		if(data.hasOwnProperty('userId') && /^\d+$/.test(data.userId) && data.userId>0){
 			var user=User.findById(data.userId);
 			if(user){
 				user.send({
-					'action': 'chat_alert_server',
+					'action': 'chat_global',
 					'msg': data.msg
 				});
 				this.user.send({
-					'action': 'server_alert',
+					'action': 'chat_global',
 					'status': 'success'
 				});
 			}else{
 				this.user.send({
-					'action': 'server_alert',
+					'action': 'chat_global',
 					'status': 'fail'
 				});
 			}
 		}else if(data.hasOwnProperty('channelId') && /^\d+$/.test(data.channelId) && data.channelId>0){
-			var channel=Channel.findById(data.userId);
+			var channel=Channel.findById(data.channelId);
 			if(channel){
 				channel.send({
-					'action': 'chat_alert_server',
+					'action': 'chat_global',
 					'msg': data.msg
 				});
 				this.user.send({
-					'action': 'server_alert',
+					'action': 'chat_global',
 					'status': 'success'
 				});
 			}else{
 				this.user.send({
-					'action': 'server_alert',
+					'action': 'chat_global',
 					'status': 'fail'
 				});
 			}
 		}else{
 			User.send({
-				'action': 'chat_alert_server',
+				'action': 'chat_global',
 				'msg': data.msg
 			});
 			this.user.send({
-				'action': 'server_alert',
+				'action': 'chat_global',
 				'status': 'success'
 			});
 		}
