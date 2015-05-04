@@ -6,7 +6,7 @@ var Http=require('http');
 var Https=require('https');
 var WebSocket=require('websocket');
 var Channel=require('./Channel.js');
-var Config=require('./Config.js')
+var Config=require('./Config.js');
 var DB=require('./DB.js');
 var User=require('./User.js');
 
@@ -21,6 +21,7 @@ else
 	var web=Http.createServer();
 var socket=new WebSocket.server();
 
+web.on('request',require('./http.js'));
 web.on('close',function(){
 	User.exit(1001);
 });

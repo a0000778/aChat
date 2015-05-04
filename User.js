@@ -48,7 +48,7 @@ User.userList=[];
 	-3=帳號停用中
 */
 User.auth=function(username,password,callback){
-	if(!username.length || username.length>usernameMaxLength || controlChars.test(username)){
+	if(User.checkInfo({'username': username})){
 		callback(-1); return;
 	}
 	DB.getUserInfoByUsername(username,function(error,result){
@@ -70,33 +70,49 @@ User.auth=function(username,password,callback){
 	});
 }
 /*
+	0=沒有問題
+	1=帳號不合法
+	2=信箱不合法
+	3=密碼不合法
+*/
+User.checkInfoFormat=function(info){
+	if(info.hasOwnProperty('username') && (!username.length || username.length>usernameMaxLength || controlChars.test(username)))
+		return 1;
+	if(info.hasOwnProperty('email') && (!profileFieldCheck.email.test(email)))
+		return 2;
+	if(info.hasOwnProperty('password') && (!profileFieldCheck.password.test(password)))
+		return 3;
+}
+/*
 	0<成功，返回userId
 	0=系統錯誤
 	-1=帳號不合法
 	-2=信箱不合法
 	-3=密碼不合法
-	-4=帳號已存在
+	-11=帳號已存在
+	-12=信箱已存在
 */
 User.register=function(username,password,email,callback){
-	if(!username.length || username.length>usernameMaxLength || controlChars.test(username)){
-		callback(-1);
+	var checkInfo=User.checkInfoFormat({
+		'username': username,
+		'password': password,
+		'email': email
+	});
+	if(!checkInfo){
+		callback(-checkInfo);
 		return;
 	}
-	if(!profileFieldCheck.email.test(email)){
-		callback(-2);
-		return;
-	}
-	if(!profileFieldCheck.password.test(password)){
-		callback(-3);
-		return;
-	}
-	DB.getUserInfoByUsername(username,function(error,result){
+	DB.checkUserExists(username,email,function(error,result){
 		if(error){
 			console.error(error);
 			callback(0); return;
 		}
 		if(result.length){
-			callback(-4); return;
+			if(result[0].username==username)
+				callback(-4);
+			else if(result[1].email==email)
+				callback(-5);
+			return;
 		}
 		var salt=genSalt();
 		var password=passwordHash(password,salt);
@@ -115,6 +131,26 @@ User.register=function(username,password,email,callback){
 			}
 		);
 	})
+}
+/*
+	0=成功
+	-1=系統錯誤
+	-2=目標不存在
+*/
+User.resetPassword=function(userId,callback){
+	var salt=genSalt();
+	var password=(Math.floor(Math.random()*Math.pow(36,8))).toString(36);
+	DB.updateUserInfo(userId,{
+		'password': passwordHash(password,salt);
+	},function(error,result){
+		if(error){
+			callback(-1);
+		}else if(result.changedRows){
+			callback(0,password);
+		}else{
+			callback(-2);
+		}
+	});
 }
 User.findById=function(userId){
 	var index=this.userIndex_userId.indexOf(userId);

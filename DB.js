@@ -20,22 +20,11 @@ var DB={};
 	}
 })(DB);
 
-/* E-mail */
-(function(DB){
-	DB.createEmailCheck=function(hash,userId,type,args,callback){
-		pool.query(//type 及 args 記錄此封驗證作用，更新email、重設密碼等
-			'INSERT INTO `emailCheck` (`hash`,`userId`,`type`,`args`) VALUES (?,?,?,?);',
-			[hash,userId,type,args],
-			callback
-		);
-	}
-	DB.getEmailCheck=function(hash,callback){
-		pool.query('select * FROM `emailCheck` WHERE `hash`=?;',[hash],callback);
-	}
-})(DB);
-
 /* User */
 (function(DB){
+	DB.checkUserExists=function(username,email,callback){
+		pool.query('SELECT `userId` FROM `user` WHERE `username`=? OR `email`=?;',[username,email],callback);
+	}
 	DB.createUser=function(info,callback){
 		pool.query(
 			'INSERT INTO `user` (`username`,`password`,`salt`,`email`,`action`,`regTime`) VALUES (?);',
@@ -48,6 +37,9 @@ var DB={};
 	}
 	DB.getUserInfoByUsername=function(username,callback){
 		pool.query('SELECT * FROM `user` WHERE `username`=?',[username],callback);
+	}
+	DB.getUserInfoByEmail=function(email,callback){
+		pool.query('SELECT * FROM `user` WHERE `email`=?',[email],callback);
 	}
 	DB.updateUserInfo=function(userId,info,callback){
 		pool.query('UPDATE `user` SET ? WHERE `userId`=?;',[info,userId],callback);
