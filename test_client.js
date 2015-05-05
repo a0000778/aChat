@@ -65,7 +65,7 @@ function connect(){
 	;
 	connectStart++;
 	client.connect(
-		'ws://localhost:8080/',
+		'ws://localhost:9700/',
 		'chatv1'
 	);
 }
@@ -101,7 +101,7 @@ function mountOutput(link,account){
 				case 'channel_switch':
 					if(['success','full'].indexOf(msg.status)!==-1){
 						makeFakeChat(link);
-					}else{
+					}else if(msg.status!='default'){
 						console.log('[Fail] channel_switch: %s',msg.status);
 						link.close();
 					}

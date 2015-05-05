@@ -51,7 +51,7 @@ function gen(){
 	var passwordStore=passwordHash(password,salt);
 	sqlFile.write(sp+mysql.format(
 		'(?,?,?,?,?,?)',
-		[username,passwordStore,salt,'a0000778@gmail.com',true,Math.floor(new Date().getTime()/1000)]
+		[username,passwordStore,salt,username+'@localhost.local',true,Math.floor(new Date().getTime()/1000)]
 	)+'\n','utf8');
 	jsFile.write(sp+JSON.stringify({'username':username,'password':password})+'\n','utf8');
 	sp=',';
