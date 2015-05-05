@@ -1,3 +1,4 @@
+'use strict';
 var mysql=require('mysql');
 var Config=require('./Config.js');
 

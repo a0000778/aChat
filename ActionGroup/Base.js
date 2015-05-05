@@ -1,3 +1,4 @@
+'use strict';
 var Channel=require('../Channel.js');
 
 function Base(){}

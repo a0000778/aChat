@@ -1,3 +1,4 @@
+'use strict';
 var Util=require('util');
 var Base=require('./Base.js');
 var Channel=require('../Channel.js');

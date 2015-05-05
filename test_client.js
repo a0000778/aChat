@@ -2,6 +2,7 @@
 壓力測試腳本
 node test_client [minOnlineUser=200 [maxOnlineUser=1000]]
 */
+'use strict';
 var WSClient=require('websocket').client;
 var Account=require('./test_account.js');
 const startCount=5000;//連線次數

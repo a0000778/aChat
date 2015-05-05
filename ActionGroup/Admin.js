@@ -1,3 +1,4 @@
+'use strict';
 var Util=require('util');
 var Base=require('./Base.js');
 var Channel=require('../Channel.js');
@@ -8,7 +9,6 @@ var User=require('../User.js');
 /* 管理指令組 */
 function Admin(user){
 	this.user=user;
-	
 }
 Util.inherits(Admin,Base);
 Admin.prototype.allUserExec=function(actionGroup,action){

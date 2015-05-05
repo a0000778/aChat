@@ -1,3 +1,4 @@
+'use strict';
 var Config=require('./Config.js');
 
 function Channel(channelId,name){

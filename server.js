@@ -1,3 +1,4 @@
+'use strict';
 var Http=require('http');
 var Https=require('https');
 var WebSocket=require('websocket');

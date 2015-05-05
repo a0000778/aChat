@@ -1,3 +1,4 @@
+'use strict';
 var Crypto=require('crypto');
 var ActionGroup;
 setImmediate(function(){//迴避互相依賴
