@@ -10,7 +10,7 @@ var quota_sendMsg=15;		//限制每20秒發訊息次數，超過限制則懲罰20
 function Normal(user){
 	this.user=user;
 	this.quota_sendMsg=quota_sendMsg;
-	this.quotaResetInterval=setInterval(quotaReset,20000);
+	this.quotaResetInterval=setInterval(this.quotaReset,20000,this);
 }
 Util.inherits(Normal,Base);
 Normal.prototype.action={
@@ -206,8 +206,8 @@ Normal.prototype.action={
 		this.user.exit();
 	}
 }
-Normal.prototype.quotaReset=function(){
-	this.quota_sendMsg=Math.min(this.quota_sendMsg+quota_sendMsg,quota_sendMsg);
+Normal.prototype.quotaReset=function(_){
+	_.quota_sendMsg=Math.min(this.quota_sendMsg+quota_sendMsg,quota_sendMsg);
 }
 Normal.prototype.umount=function(){
 	clearInterval(this.quotaResetInterval);
