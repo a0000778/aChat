@@ -64,7 +64,7 @@ Normal.prototype.action={
 		this.user.send({
 			'action': 'channel_userList',
 			'status': 'success',
-			'channelId': channelId || channel.id,
+			'channelId': channelId || channel.channelId,
 			'userList': list || channel.onlineList.reduce(function(list,user){
 				list.push({'userId':user.userId,'username':user.username});
 				return list;
