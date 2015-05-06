@@ -75,7 +75,7 @@ Normal.prototype.action={
 		if(!data.msg || typeof(data.msg)!='string' || !data.msg.length) return;
 		if(!this.user.channel) return;
 		var time=Math.floor(new Date().getTime()/1000);
-		if(!this.quota_sendMsg){
+		if(this.quota_sendMsg<=0){
 			this.user.send({
 				'action': 'chat_notice',
 				'msg': '超過每20秒發言頻率上限，請稍候再試。',
@@ -99,7 +99,7 @@ Normal.prototype.action={
 		var target=User.findById(data.toUserId);
 		if(target){
 			var time=Math.floor(new Date().getTime()/1000);
-			if(!this.quota_sendMsg){
+			if(this.quota_sendMsg<=0){
 				this.user.send({
 					'action': 'chat_notice',
 					'msg': '超過每20秒發言頻率上限，請稍候再試。',
@@ -208,7 +208,7 @@ Normal.prototype.action={
 	}
 }
 Normal.prototype.quotaReset=function(_){
-	_.quota_sendMsg=Math.min(this.quota_sendMsg+quota_sendMsg,quota_sendMsg);
+	_.quota_sendMsg=Math.min(_.quota_sendMsg+quota_sendMsg,quota_sendMsg);
 }
 Normal.prototype.umount=function(){
 	clearInterval(this.quotaResetInterval);
