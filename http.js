@@ -17,12 +17,14 @@ router.post('/v1/forgotPassword',function(req,res){
 		'maxFields': 1,
 	}).parse(req,function(error,fields,files){
 		if(error || !fields.hasOwnProperty('email')){
-			res.writeHead(400).end();
+			res.writeHead(400);
+			res.end();
 			return;
 		}
 		DB.getUserInfoByEmail(fields.email,function(error,result){
 			if(error){
-				res.writeHead(500).end();
+				res.writeHead(500);
+			res.end();
 				return;
 			}
 			result=result[0];
@@ -47,7 +49,8 @@ router.post('/v1/forgotPassword',function(req,res){
 				'html': renderTemplate(mailTemplate.contextHTML,mailArgs)
 			});
 			codeList.set(code,resetInfo);
-			res.writeHead(200).end();
+			res.writeHead(200);
+			res.end();
 		});
 	});
 });
@@ -57,19 +60,22 @@ router.post('/v1/resetPassword',function(req,res){
 		'maxFields': 1,
 	}).parse(req,function(error,fields,files){
 		if(error || !fields.hasOwnProperty('code')){
-			res.writeHead(400).end();
+			res.writeHead(400);
+			res.end();
 			return;
 		}
 		var actionInfo=codeList.get(fields.code);
 		if(!actionInfo || actionInfo.action!='resetPassword'){
-			res.writeHead(200).end('not exists');
+			res.writeHead(200);
+			res.end('not exists');
 			return;
 		}
 		codeList.delete(fields.code);
 		User.resetPassword(actionInfo.userId,function(result,password){
 			switch(result){
 				case 0:
-					res.writeHead(200).end('OK');
+					res.writeHead(200);
+					res.end('OK');
 					var mailTemplate=Config.mailTemplate.resetPassword;
 					var mailArgs={
 						'username': actionInfo.username,
@@ -86,7 +92,8 @@ router.post('/v1/resetPassword',function(req,res){
 				case -2:
 					console.error('[HTTP] /v1/resetPassword 重設不存在的使用者的密碼');
 				case -1:
-					res.writeHead(500).end();
+					res.writeHead(500);
+					res.end();
 				break;
 			}
 		});
@@ -102,12 +109,14 @@ router.post('/v1/register',function(req,res){
 			&& fields.hasOwnProperty('email')
 			&& fields.hasOwnProperty('password')
 		)){
-			res.writeHead(400).end();
+			res.writeHead(400);
+			res.end();
 			return;
 		}
 		DB.checkUserExists(fields.username,fields.email,function(error,result){
 			if(error){
-				res.writeHead(500).end();
+				res.writeHead(500);
+				res.end();
 				return;
 			}
 			if(result.length){
@@ -139,7 +148,8 @@ router.post('/v1/register',function(req,res){
 				'html': renderTemplate(mailTemplate.contextHTML,mailArgs)
 			});
 			codeList.set(code,resetInfo);
-			res.writeHead(200).end('OK');
+			res.writeHead(200);
+			res.end('OK');
 		});
 	});
 });
@@ -149,11 +159,13 @@ router.post('/v1/mail',function(req,res){
 		'maxFields': 3,
 	}).parse(req,function(error,fields,files){
 		if(error || !fields.hasOwnProperty('code')){
-			res.writeHead(400).end();
+			res.writeHead(400);
+			res.end();
 			return;
 		}
 		if(!codeList.has(fields.code)){
-			res.writeHead(200).end('not exists');
+			res.writeHead(200);
+			res.end('not exists');
 			return;
 		}
 		var actionInfo=codeList.get(fields.code);
@@ -163,28 +175,34 @@ router.post('/v1/mail',function(req,res){
 				User.register(fields.username,fields.password,fields.email,function(result){
 					switch(result){
 						case 0:
-							res.writeHead(500).end();
+							res.writeHead(500);
+							res.end();
 						break;
 						case -1:
 						case -2:
 						case -3:
 							console.error('[HTTP] /v1/mail，操作 register 於已檢查的資料被確認出不合法！')
-							res.writeHead(500).end();
+							res.writeHead(500);
+							res.end();
 						break;
 						case -11:
-							res.writeHead(200).end('username');
+							res.writeHead(200);
+							res.end('username');
 						break;
 						case -12:
-							res.writeHead(200).end('email');
+							res.writeHead(200);
+							res.end('email');
 						break;
 						default:
-							res.writeHead(200).end('OK');
+							res.writeHead(200);
+							res.end('OK');
 					}
 				});
 			break;
 			default:
 				console.error('[HTTP] /v1/mail 未知的操作 %s',actionInfo.action);
-				res.writeHead(500).end();
+				res.writeHead(500);
+			res.end();
 		}
 	});
 });
@@ -209,4 +227,7 @@ function renderTemplate(template,args){
 	});
 }
 
-module.exports=router;
+module.exports=function(req,res){
+	res.setHeader('Access-Control-Allow-Origin',req.headers['origin']);
+	router(req,res);
+};
