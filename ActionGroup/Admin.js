@@ -276,7 +276,7 @@ Admin.prototype.chat_global=function(data){
 }
 Admin.prototype._umount=function(){
 	clearInterval(this._quotaResetInterval);
-	Base.prototype._umount.call(this);
+	Normal.prototype._umount.call(this);
 }
 
 module.exports=Admin;
