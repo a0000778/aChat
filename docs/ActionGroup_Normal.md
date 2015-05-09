@@ -73,7 +73,8 @@
 ### user_getProfile
 取得自己的使用者資料
 #### 參數
-無
+* `userIds` (Array)
+	* (Number) 欲查詢的 userId
 
 #### 返回結果
 ##### 查詢成功
