@@ -32,7 +32,7 @@ function User(link){
 			_.exit();
 		})
 		.on('message',function(data){
-			_.actionGroup.exec(data);
+			_.actionGroup._exec(data);
 		})
 	;
 	
@@ -173,7 +173,7 @@ User.exit=function(code){
 User.prototype.exit=function(code){
 	if(this.link.connected) this.link.close(code);
 	if(this.channel) this.channel.exit(this);
-	this.actionGroup.umount();
+	this.actionGroup._umount();
 	var index=User.userList.indexOf(this);
 	if(index>=0){
 		User.userIndex_userId.splice(index,1);
