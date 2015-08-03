@@ -33,6 +33,13 @@ var DB={};
 			callback
 		);
 	}
+	DB.createSession=function(info,callback){
+		pool.query(
+			'INSERT INTO `session` (`sid`,`userId`,`createTime`) VALUES (?);',
+			[[info.sid,info.userId,new Date()]],
+			callback
+		);
+	}
 	DB.getUserInfoById=function(userId,callback){
 		pool.query('SELECT * FROM `user` WHERE `userId`=?',[userId],callback);
 	}
@@ -41,6 +48,9 @@ var DB={};
 	}
 	DB.getUserInfoByEmail=function(email,callback){
 		pool.query('SELECT * FROM `user` WHERE `email`=?',[email],callback);
+	}
+	DB.getUserSession=function(userId,session,callback){
+		pool.query('SELECT * FROM `session` WHERE `session`=? AND `userId`=?',[session,userId],callback);
 	}
 	DB.updateUserInfo=function(userId,info,callback){
 		pool.query('UPDATE `user` SET ? WHERE `userId`=?;',[info,userId],callback);

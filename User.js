@@ -82,6 +82,86 @@ User.auth=function(username,password,callback){
 	});
 }
 /*
+	建立Session
+	成功，返回[userId,session]
+	0=系統錯誤
+	-1=帳號不合法
+	-2=驗證失敗
+	-3=帳號停用中
+*/
+User.createSession=function(username,question,anwser,callback){
+	if(User.checkInfoFormat({'username': username})){
+		callback(-1); return;
+	}
+	DB.getUserInfoByUsername(username,function(error,result){
+		if(error){
+			console.error(error);
+			callback(0);
+			return;
+		}
+		if(!result.length){
+			callback(-2);
+			return;
+		}
+		result=result[0];
+		
+		if(anwser==passwordHmac(question,result.password)){
+			if(result.active){
+				var sid=Crypto.randomBytes(8);
+				DB.createSession({
+					'sid': sid,
+					'userId': result.userId
+				},function(error){
+					if(error){
+						console.error(error);
+						callback(0);
+						return;
+					}
+					callback([userId,sid]);
+				});
+			}else callback(-3);
+		}else
+			callback(-2);
+	});
+}
+/*
+	成功，返回userData
+	0=系統錯誤
+	-1=userId不合法
+	-2=驗證失敗
+	-3=帳號停用中
+*/
+User.authBySession=function(userId,session,callback){
+	if(User.checkInfoFormat({'userId': userId})){
+		callback(-1); return;
+	}
+	DB.getUserSession(userId,session,function(){
+		if(error){
+			console.error(error);
+			callback(0);
+			return;
+		}
+		if(!result.length){
+			callback(-2);
+			return;
+		}
+		DB.getUserInfoById(userId,function(error,result){
+			if(error){
+				console.error(error);
+				callback(0);
+				return;
+			}
+			if(!result.length){
+				callback(-2);
+				return;
+			}
+			result=result[0];
+			if(result.active) callback(result);
+			else callback(-3);
+		});
+	});
+}
+/*
 	0=沒有問題
 	1=帳號不合法
 	2=信箱不合法
@@ -251,6 +331,12 @@ User.prototype.updateId=function(userId){
 
 function passwordHash(password,salt){
 	return Crypto.createHash('sha256').update(salt).update(password).digest('hex');
+	/*return Crypto.createHash('sha256').update(
+		Crypto.createHash('md5').update(password).digest();
+	).update(password).digest('hex');*/
+}
+function passwordHmac(question,password){
+	return Crypto.createHmac('sha256',password).update(question).digest('hex');
 }
 function genSalt(){
 	var salt='';
