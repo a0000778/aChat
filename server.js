@@ -85,7 +85,7 @@ DB.getAllChannel(function(error,result){
 	});
 });
 
-if(Config.debug)
+if(process.env.NODE_DEBUG)
 	setInterval(function(){
 		var ram=process.memoryUsage();
 		console.log(
