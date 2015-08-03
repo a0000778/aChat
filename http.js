@@ -24,7 +24,7 @@ router.post('/v1/forgotPassword',function(req,res){
 		DB.getUserInfoByEmail(fields.email,function(error,result){
 			if(error){
 				res.writeHead(500);
-			res.end();
+				res.end();
 				return;
 			}
 			result=result[0];
