@@ -97,7 +97,10 @@ router.post('/v1/resetPassword',function(req,res){
 					debug('[/v1/resetPassword] code %s: %j',fields.code,mailArgs);
 				break;
 				case -2:
+					res.writeHead(200);
+					res.end('not exists');
 					debug('[/v1/resetPassword] code %s: userId %d 不存在',fields.code,actionInfo.userId);
+				break;
 				case -1:
 					res.writeHead(500);
 					res.end();
