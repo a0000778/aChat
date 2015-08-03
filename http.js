@@ -27,6 +27,8 @@ router.post('/v1/forgotPassword',function(req,res){
 				res.end();
 				return;
 			}
+			res.writeHead(200);
+			res.end();
 			result=result[0];
 			if(!result) return;
 			var code=genCode(42);
@@ -49,8 +51,6 @@ router.post('/v1/forgotPassword',function(req,res){
 				'html': renderTemplate(mailTemplate.contextHTML,mailArgs)
 			});
 			codeList.set(code,resetInfo);
-			res.writeHead(200);
-			res.end();
 		});
 	});
 });
