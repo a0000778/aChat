@@ -1,5 +1,6 @@
 'use strict';
 var debug=require('util').debuglog('httpApi');
+var domainCreate=require('domain').create;
 var formidable=require('formidable');
 var router=require('light-router');
 var nodemailer=require('nodemailer');
@@ -241,6 +242,17 @@ function renderTemplate(template,args){
 }
 
 module.exports=function(req,res){
+	let domain=domainCreate();
+	domain.add(req);
+	domain.add(res);
+	domain.on('error',function(error){
+		debug(error);
+		res.socket.destroy();
+	});
+	domain.enter();
+	
 	if(req.headers['origin']) res.setHeader('Access-Control-Allow-Origin',req.headers['origin']);
 	router(req,res);
+	
+	domain.exit();
 };
