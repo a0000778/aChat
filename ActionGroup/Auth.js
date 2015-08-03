@@ -24,10 +24,9 @@ Auth.timeout=function(user){
 	user.exit(4100);
 }
 Auth.prototype.auth=function(data){
-	if(!data.username || this.authing){
-		return;
-	}
+	if(!data.username || !data.password || this._authing) return;
 	var _=this;
+	this._authing=true;
 	User.auth(data.username,data.password,function(result){
 		if(result===0){
 			_._user.exit(4003);
@@ -63,6 +62,7 @@ Auth.prototype.auth=function(data){
 			});
 			_._umount();
 		}
+		_._authing=false;
 	});
 }
 
