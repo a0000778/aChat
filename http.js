@@ -1,4 +1,5 @@
 'use strict';
+var debug=require('util').debuglog('httpApi');
 var formidable=require('formidable');
 var router=require('light-router');
 var nodemailer=require('nodemailer');
@@ -30,7 +31,10 @@ router.post('/v1/forgotPassword',function(req,res){
 			res.writeHead(200);
 			res.end();
 			result=result[0];
-			if(!result) return;
+			if(!result){
+				debug('[/v1/forgotPassword] %s 不存在',fields.email);
+				return;
+			}
 			var code=genCode(42);
 			var resetInfo={
 				'action': 'resetPassword',
@@ -51,6 +55,7 @@ router.post('/v1/forgotPassword',function(req,res){
 				'html': renderTemplate(mailTemplate.contextHTML,mailArgs)
 			});
 			codeList.set(code,resetInfo);
+			debug('[/v1/forgotPassword] code %s: %j',code,resetInfo);
 		});
 	});
 });
@@ -68,6 +73,7 @@ router.post('/v1/resetPassword',function(req,res){
 		if(!actionInfo || actionInfo.action!='resetPassword'){
 			res.writeHead(200);
 			res.end('not exists');
+			debug('[/v1/resetPassword] code %s: 不存在',fields.code);
 			return;
 		}
 		codeList.delete(fields.code);
@@ -88,9 +94,10 @@ router.post('/v1/resetPassword',function(req,res){
 						'text': renderTemplate(mailTemplate.contextText,mailArgs),
 						'html': renderTemplate(mailTemplate.contextHTML,mailArgs)
 					});
+					debug('[/v1/resetPassword] code %s: %j',fields.code,mailArgs);
 				break;
 				case -2:
-					console.error('[HTTP] /v1/resetPassword 重設不存在的使用者的密碼');
+					debug('[/v1/resetPassword] code %s: userId %d 不存在',fields.code,actionInfo.userId);
 				case -1:
 					res.writeHead(500);
 					res.end();
@@ -122,8 +129,10 @@ router.post('/v1/register',function(req,res){
 			if(result.length){
 				if(result[0].username==fields.username){
 					res.end('username');
+					debug('[/v1/register] 帳號 %s 已存在',fields.username);
 				}else if(result[0].email==fields.email){
 					res.end('email');
+					debug('[/v1/register] 信箱 %s 已存在',fields.email);
 				}
 				return;
 			}
@@ -150,6 +159,7 @@ router.post('/v1/register',function(req,res){
 			codeList.set(code,resetInfo);
 			res.writeHead(200);
 			res.end('OK');
+			debug('[/v1/register] 等待信箱驗證: %j',resetInfo);
 		});
 	});
 });
