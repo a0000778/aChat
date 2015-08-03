@@ -47,7 +47,8 @@ function closeAll(){
 function connect(){
 	var client=new WSClient();
 	var account=Account.shift();
-
+	
+	if(!account) return;
 	client
 		.on('connect',function(link){
 			link.sendUTF(JSON.stringify({
