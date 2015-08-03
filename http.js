@@ -34,7 +34,7 @@ router.post('/v1/forgotPassword',function(req,res){
 			var code=genCode(42);
 			var resetInfo={
 				'action': 'resetPassword',
-				'timeout': Math.floor(Date.now()/1000)+Config.mailCheckTimeout,
+				'timeout': Math.floor(Date.now()/1000)+Config.mailTimeout,
 				'userId': result.userId,
 				'username': result.username
 			};
@@ -130,7 +130,7 @@ router.post('/v1/register',function(req,res){
 			var code=genCode(42);
 			var resetInfo={
 				'action': 'register',
-				'timeout': Math.floor(Date.now()/1000)+Config.mailCheckTimeout,
+				'timeout': Math.floor(Date.now()/1000)+Config.mailTimeout,
 				'username': fields.username,
 				'email': fields.email,
 				'password': fields.password
