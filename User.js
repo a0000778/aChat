@@ -1,5 +1,7 @@
 'use strict';
 var Crypto=require('crypto');
+var domainCreate=require('domain').create;
+var debug=require('util').debuglog('User.js');
 var ActionGroup;
 setImmediate(function(){//迴避互相依賴
 	ActionGroup=require('./ActionGroup.js');
@@ -17,17 +19,24 @@ const saltLength=8;//salt 長度
 const saltChar='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`-=[];’,./~!@#$%^&*()_+{}|:”<>?\\';//salt 字元
 
 function User(link){
+	var _=this;
+	
+	let domain=domainCreate();
+	domain.add(this);
+	domain.add(link);
+	domain.on('error',function(error){
+		debug('userId=%d, error=%s',_.userId,error);
+		_.exit();
+	});
+	domain.enter();
+	
 	this.userId=null;
 	this.username=null;
 	this.link=link;
 	this.channel=null;
 	this.actionGroup=new ActionGroup.Auth(this);
 	
-	var _=this;
 	link
-		.on('error',function(error){
-			console.log('User Error: %s',error);
-		})
 		.on('close',function(){
 			_.exit();
 		})
@@ -38,6 +47,8 @@ function User(link){
 	
 	User.userList.push(this);
 	User.userIndex_userId.push(this.userId);
+	
+	domain.exit();
 }
 User.userIndex_userId=[];
 User.userList=[];
