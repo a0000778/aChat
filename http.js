@@ -241,6 +241,6 @@ function renderTemplate(template,args){
 }
 
 module.exports=function(req,res){
-	res.setHeader('Access-Control-Allow-Origin',req.headers['origin']);
+	if(req.headers['origin']) res.setHeader('Access-Control-Allow-Origin',req.headers['origin']);
 	router(req,res);
 };
