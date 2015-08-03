@@ -250,7 +250,7 @@ User.prototype.updateId=function(userId){
 }
 
 function passwordHash(password,salt){
-	return Crypto.createHash(Config.userPasswordHash).update(salt).update(password).digest('hex');
+	return Crypto.createHash('sha256').update(salt).update(password).digest('hex');
 }
 function genSalt(){
 	var salt='';
