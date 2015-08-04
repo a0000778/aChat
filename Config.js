@@ -1,5 +1,4 @@
 module.exports={
-	'debug': true,					//除錯訊息輸出
 	'port': 9700,					//伺服器監聽 port
 	'ssl': false,					//SSL連線，設定項參考 http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener
 	
