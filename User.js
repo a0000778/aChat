@@ -26,7 +26,7 @@ function User(link){
 	domain.add(link);
 	domain.on('error',function(error){
 		debug('userId=%d, error=%s',_.userId,error);
-		_.exit();
+		_.exit(4003);
 	});
 	domain.enter();
 	
