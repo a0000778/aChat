@@ -74,7 +74,7 @@ User.auth=function(username,password,callback){
 			return;
 		}
 		result=result[0];
-		if(result.password==passwordHash(password,result.salt)){
+		if(result.password==password){
 			if(result.active) callback(result);
 			else callback(-3);
 		}else
@@ -206,13 +206,11 @@ User.register=function(username,password,email,callback){
 				callback(-5);
 			return;
 		}
-		var salt=genSalt();
-		var password=passwordHash(password,salt);
 		DB.createUser(
 			{
 				'username': username,
 				'password': password,
-				'salt': salt,
+				'salt': '',
 				'email': email,
 				'active': true,
 				'regTime': Math.floor(new Date().getTime()/1000)
@@ -230,10 +228,9 @@ User.register=function(username,password,email,callback){
 	-2=目標不存在
 */
 User.resetPassword=function(userId,callback){
-	var salt=genSalt();
 	var password=(Math.floor(Math.random()*Math.pow(36,8))).toString(36);
 	DB.updateUserInfo(userId,{
-		'password': passwordHash(password,salt)
+		'password': passwordHash(password)
 	},function(error,result){
 		if(error){
 			callback(-1);
@@ -287,9 +284,8 @@ User.prototype.profile=function(data,callback){
 				}
 			}
 			if(data.hasOwnProperty('newPassword')){
-				var salt=getSalt();
-				data.password=passwordHash(data.newPassword,salt);
-				data.salt=salt;
+				data.password=data.newPassword;
+				data.salt='';
 				delete data.newPassword;
 			}else{
 				delete data.password;
@@ -329,21 +325,13 @@ User.prototype.updateId=function(userId){
 	User.userIndex_userId[User.userList.indexOf(this)]=userId;
 }
 
-function passwordHash(password,salt){
-	return Crypto.createHash('sha256').update(salt).update(password).digest('hex');
-	/*return Crypto.createHash('sha256').update(
-		Crypto.createHash('md5').update(password).digest();
-	).update(password).digest('hex');*/
+function passwordHash(password){
+	return Crypto.createHash('sha256').update(
+		Crypto.createHash('md5').update(password).digest()
+	).update(password).digest('hex');
 }
 function passwordHmac(question,password){
 	return Crypto.createHmac('sha256',password).update(question).digest('hex');
-}
-function genSalt(){
-	var salt='';
-	while(salt.length<saltLength){
-		salt+=saltChar.charAt(Math.floor(Math.random()*saltChar.length));
-	}
-	return salt;
 }
 
 module.exports=User;
