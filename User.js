@@ -1,7 +1,7 @@
 'use strict';
 var Crypto=require('crypto');
 var domainCreate=require('domain').create;
-var debug=require('util').debuglog('User.js');
+var debug=require('util').debuglog('User');
 var ActionGroup;
 setImmediate(function(){//迴避互相依賴
 	ActionGroup=require('./ActionGroup.js');
