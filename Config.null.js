@@ -10,7 +10,7 @@ module.exports={
 	'chatLogCacheCount': 500,		//每多少筆記錄寫入一次
 	'chatLogCacheTTL': 600*1000,	//無觸發 chatLogCacheCount 的情況下，多久寫入一次記錄(毫秒)
 	
-	'mailTimeout': 43200,			//發信確認類有效時間(秒)
+	'mailTimeout': 3600,			//發信確認類有效時間(秒)
 	'mailSender': 'me@chat',		//確認信發信者E-mail
 	'mailTemplate': {
 		'checkMail': {
@@ -50,10 +50,10 @@ module.exports={
 	},
 	
 	'DBConnect': {					//資料庫連線設定，詳細參考套件 mysql
-		'host': '10.211.55.8',
+		'host': 'localhost',
 		'port': 3306,
 		'user': 'achat',
-		'password': '*Rr_sb16&]=]',
+		'password': '',
 		'database': 'achat',
 		'connectionLimit': 10
 	},
