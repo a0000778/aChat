@@ -13,6 +13,7 @@ var codeList=new Map();
 var codeListClear=setInterval(clearCode,60000);
 var mailer=nodemailer.createTransport(Config.mailer);
 
+router.options('/v1/forgotPassword',allowPost);
 router.post('/v1/forgotPassword',function(req,res){
 	new formidable({
 		'maxFieldsSize': 512,
@@ -60,6 +61,7 @@ router.post('/v1/forgotPassword',function(req,res){
 		});
 	});
 });
+router.options('/v1/resetPassword',allowPost);
 router.post('/v1/resetPassword',function(req,res){
 	new formidable({
 		'maxFieldsSize': 512,
@@ -110,6 +112,7 @@ router.post('/v1/resetPassword',function(req,res){
 		});
 	});
 });
+router.options('/v1/register',allowPost);
 router.post('/v1/register',function(req,res){
 	new formidable({
 		'maxFieldsSize': 1024,
@@ -167,6 +170,7 @@ router.post('/v1/register',function(req,res){
 		});
 	});
 });
+router.options('/v1/mail',allowPost);
 router.post('/v1/mail',function(req,res){
 	new formidable({
 		'maxFieldsSize': 512,
@@ -186,7 +190,7 @@ router.post('/v1/mail',function(req,res){
 		codeList.delete(fields.code);
 		switch(actionInfo.action){
 			case 'register':
-				User.register(fields.username,fields.password,fields.email,function(result){
+				User.register(actionInfo.username,actionInfo.password,actionInfo.email,function(result){
 					switch(result){
 						case 0:
 							res.writeHead(500);
@@ -239,6 +243,12 @@ function renderTemplate(template,args){
 	return template.replace(/\{([a-zA-Z0-9_]+)\}/g,function(find,tag){
 		return args.hasOwnProperty(tag)? args[tag]:find;
 	});
+}
+function allowPost(req,res){
+	res.setHeader('Access-Control-Allow-Headers','Content-Type');
+	res.setHeader('Access-Control-Allow-Methods','OPTIONS, POST');
+	res.setHeader('Access-Control-Max-Age',86400);
+	res.end();
 }
 
 module.exports=function(req,res){
