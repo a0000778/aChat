@@ -4,6 +4,7 @@ var domainCreate=require('domain').create;
 var formidable=require('formidable');
 var router=require('light-router');
 var nodemailer=require('nodemailer');
+var util=require('util');
 var Config=require('./Config.js');
 var DB=require('./DB.js');
 var User=require('./User.js');
@@ -223,6 +224,26 @@ router.post('/v1/mail',function(req,res){
 			res.end();
 		}
 	});
+});
+if(process.env.NODE_DEBUG) router.get('/v1/status',function(req,res){
+	res.setHeader('Content-Type','text/plain; charset=utf-8');
+	
+	res.write(util.format('在線人數: %d / %d\n',User.userList.length,Config.userMax));
+	res.write(util.format('記憶體: %d KB\n',Math.ceil(process.memoryUsage().rss/1024)));
+	res.write(util.format('記錄寫入快取: %d\n',DB.chatLogCacheCount()));
+	
+	res.write(util.format('\n驗證代碼列表: (共計 %d 筆)\n',codeList.size));
+	for(let code of codeList){
+		res.write(util.format(
+			'%s: action=%s, username=%s, timeout=%s\n',
+			code[0],
+			code[1].action,
+			code[1].username,
+			new Date(code[1].timeout*1000).toLocaleString()
+		));
+	}
+	
+	res.end();
 });
 
 function clearCode(){

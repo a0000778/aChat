@@ -84,14 +84,3 @@ DB.getAllChannel(function(error,result){
 		}
 	});
 });
-
-if(process.env.NODE_DEBUG)
-	setInterval(function(){
-		var ram=process.memoryUsage();
-		console.log(
-			'在線: %d, RAM: %d KB, 聊天記錄快取: %d',
-			User.userList.length,
-			Math.floor(ram.rss/1024),
-			DB.chatLogCacheCount()
-		);
-	},1000);
