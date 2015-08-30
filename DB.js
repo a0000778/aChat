@@ -28,8 +28,8 @@ var DB={};
 	}
 	DB.createUser=function(info,callback){
 		pool.query(
-			'INSERT INTO `user` (`username`,`password`,`salt`,`email`,`action`,`regTime`) VALUES (?);',
-			[[info.username,info.password,info.salt,info.email,info.action,info.regTime]],
+			'INSERT INTO `user` (`username`,`password`,`salt`,`email`,`active`,`regTime`) VALUES (?);',
+			[[info.username,info.password,info.salt,info.email,info.active,info.regTime]],
 			callback
 		);
 	}
