@@ -247,11 +247,11 @@ if(process.env.NODE_DEBUG) router.get('/v1/status',function(req,res){
 });
 
 function clearCode(){
-	var now=Math.floor(Date.now()/1000);
-	codeList.forEach(function(info,key){
-		if(key.timeout<now)
-			codeList.delete(key);
-	});
+	let now=Math.floor(Date.now()/1000);
+	for(let codeInfo of codeList){
+		if(codeInfo[1].timeout<now)
+			codeList.delete(codeInfo[0]);
+	}
 }
 function genCode(len){
 	var code='';
