@@ -174,6 +174,7 @@ User.checkInfoFormat=function(info){
 		return 2;
 	if(info.hasOwnProperty('password') && (!profileFieldCheck.password.test(info.password)))
 		return 3;
+	return 0;
 }
 /*
 	0<成功，返回userId
@@ -190,7 +191,7 @@ User.register=function(username,password,email,callback){
 		'password': password,
 		'email': email
 	});
-	if(!checkInfo){
+	if(checkInfo){
 		callback(-checkInfo);
 		return;
 	}
