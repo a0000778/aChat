@@ -51,11 +51,11 @@ router.post('/v1/forgotPassword',function(req,res){
 				'code': code
 			};
 			mailer.sendMail({
-				'from': Config.mailCheckSender,
+				'from': Config.mailSender,
 				'to': result.email,
 				'subject': renderTemplate(mailTemplate.subject,mailArgs),
-				'text': renderTemplate(mailTemplate.contextText,mailArgs),
-				'html': renderTemplate(mailTemplate.contextHTML,mailArgs)
+				'text': renderTemplate(mailTemplate.contentText,mailArgs),
+				'html': renderTemplate(mailTemplate.contentHTML,mailArgs)
 			});
 			codeList.set(code,resetInfo);
 			debug('[/v1/forgotPassword] code %s: %j',code,resetInfo);
@@ -158,11 +158,11 @@ router.post('/v1/register',function(req,res){
 				'code': code
 			};
 			mailer.sendMail({
-				'from': Config.mailCheckSender,
-				'to': result.email,
+				'from': Config.mailSender,
+				'to': fields.email,
 				'subject': renderTemplate(mailTemplate.subject,mailArgs),
-				'text': renderTemplate(mailTemplate.contextText,mailArgs),
-				'html': renderTemplate(mailTemplate.contextHTML,mailArgs)
+				'text': renderTemplate(mailTemplate.contentText,mailArgs),
+				'html': renderTemplate(mailTemplate.contentHTML,mailArgs)
 			});
 			codeList.set(code,resetInfo);
 			res.writeHead(200);
