@@ -1,8 +1,15 @@
+var readFileSync=require('fs').readFileSync;
+
+function readFile(filename){
+	return readFileSync(filename,{'encoding': 'utf8'});
+}
+
 module.exports={
+	'debug': true,					//除錯模式
 	'port': 9700,					//伺服器監聽 port
 	'ssl': false,					//SSL連線，設定項參考 http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener
 	
-	'userMax': 1000,				//全服最大在線人數
+	'sessionMax': 1000,				//全服最大連線數
 	
 	'channelDefault': 1,			//預設頻道ID
 	'channelUserMax': 200,			//單一頻道人數上限
@@ -10,19 +17,17 @@ module.exports={
 	'chatLogCacheCount': 500,		//每多少筆記錄寫入一次
 	'chatLogCacheTTL': 600*1000,	//無觸發 chatLogCacheCount 的情況下，多久寫入一次記錄(毫秒)
 	
-	'mailTimeout': 3600,			//發信確認類有效時間(秒)
+	'mailTimeout': 3600*1000,		//發信確認類有效時間(秒)
 	'mailSender': 'me@chat',		//確認信發信者E-mail
 	'mailTemplate': {
-		'checkMail': {
+		'register': {
 			/*
-			信箱驗證信模板
+			註冊驗證信模板
 			{username}	表示使用者帳號
 			{code}		表示驗證碼
 			*/
 			'subject': '[aChat 聊天室] 信箱驗證',
-			'contentText': '如果你沒有申請聊天室帳號或更改信箱，請忽略這封信件。\
-			\
-			驗證碼：{code}',
+			'contentText': readFile('./template/register.txt'),
 			'contentHTML': null
 		},
 		'forgotPassword': {
@@ -32,9 +37,7 @@ module.exports={
 			{code}		表示重設碼
 			*/
 			'subject': '[aChat 聊天室] 密碼重置確認',
-			'contentText': '如果你沒有進行密碼重設操作，請忽略這封信件。\
-			\
-			重設碼：{code}',
+			'contentText': readFile('./template/forgotPassword.txt'),
 			'contentHTML': null
 		},
 		'resetPassword': {
@@ -44,12 +47,22 @@ module.exports={
 			{password}	表示新密碼
 			*/
 			'subject': '[aChat 聊天室] 新密碼',
-			'contentText': '新的密碼為 {password}，請盡快修改密碼。',
+			'contentText': readFile('./template/resetPassword.txt'),
+			'contentHTML': null
+		},
+		'updateEmail': {
+			/*
+			信箱驗證信模板
+			{username}	表示使用者帳號
+			{code}		表示驗證碼
+			*/
+			'subject': '[aChat 聊天室] 信箱更新驗證',
+			'contentText': readFile('./template/updateEmail.txt'),
 			'contentHTML': null
 		}
 	},
 	
-	'DBConnect': {					//資料庫連線設定，詳細參考套件 mysql
+	'mysql': {					//資料庫連線設定，詳細參考套件 mysql
 		'host': 'localhost',
 		'port': 3306,
 		'user': 'achat',
@@ -61,6 +74,7 @@ module.exports={
 	'mailer': {						//發信設定，詳細參考套件 nodemailer
 		'host': 'localhost',
 		'port': 25,
+		'secure': false,
 		'auth': {
 			'user': '',
 			'pass': ''
