@@ -1,18 +1,17 @@
 'use strict';
-var debug=require('util').debuglog('httpApi');
+var config=require('./config.js');
+var crypto=require('crypto');
 var domainCreate=require('domain').create;
 var formidable=require('formidable');
-var router=require('light-router');
 var nodemailer=require('nodemailer');
+var router=require('light-router');
 var util=require('util');
-var Config=require('./Config.js');
-var DB=require('./DB.js');
-var User=require('./User.js');
+var user=require('./user.js');
 
-const codeChar='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var codeList=new Map();
+var keepUsername=new Set();
 var codeListClear=setInterval(clearCode,60000);
-var mailer=nodemailer.createTransport(Config.mailer);
+var mailer=nodemailer.createTransport(config.mailer);
 
 router.options('/v1/forgotPassword',allowPost);
 router.post('/v1/forgotPassword',function(req,res){
@@ -20,45 +19,34 @@ router.post('/v1/forgotPassword',function(req,res){
 		'maxFieldsSize': 512,
 		'maxFields': 1,
 	}).parse(req,function(error,fields,files){
-		if(error || !fields.hasOwnProperty('email')){
+		if(error || !fields.hasOwnProperty('email') || !user.fieldCheck.email(fields.email)){
 			res.writeHead(400);
 			res.end();
 			return;
 		}
-		DB.getUserInfoByEmail(fields.email,function(error,result){
-			if(error){
-				res.writeHead(500);
-				res.end();
-				return;
-			}
-			res.writeHead(200);
+		user.findUser('email',fields.email,function(result){
 			res.end();
-			result=result[0];
-			if(!result){
-				debug('[/v1/forgotPassword] %s 不存在',fields.email);
-				return;
-			}
-			var code=genCode(42);
-			var resetInfo={
+			if(!result) return;
+			let code=genCode();
+			let resetInfo={
 				'action': 'resetPassword',
-				'timeout': Math.floor(Date.now()/1000)+Config.mailTimeout,
+				'timeout': Date.now()+config.mailTimeout,
 				'userId': result.userId,
 				'username': result.username
-			};
-			var mailTemplate=Config.mailTemplate.forgotPassword;
-			var mailArgs={
+			}
+			let mailTemplate=config.mailTemplate.forgotPassword;
+			let mailArgs={
 				'username': result.username,
 				'code': code
 			};
 			mailer.sendMail({
-				'from': Config.mailSender,
+				'from': config.mailSender,
 				'to': result.email,
 				'subject': renderTemplate(mailTemplate.subject,mailArgs),
 				'text': renderTemplate(mailTemplate.contentText,mailArgs),
 				'html': renderTemplate(mailTemplate.contentHTML,mailArgs)
 			});
 			codeList.set(code,resetInfo);
-			debug('[/v1/forgotPassword] code %s: %j',code,resetInfo);
 		});
 	});
 });
@@ -75,41 +63,24 @@ router.post('/v1/resetPassword',function(req,res){
 		}
 		var actionInfo=codeList.get(fields.code);
 		if(!actionInfo || actionInfo.action!='resetPassword'){
-			res.writeHead(200);
 			res.end('not exists');
-			debug('[/v1/resetPassword] code %s: 不存在',fields.code);
 			return;
 		}
 		codeList.delete(fields.code);
-		User.resetPassword(actionInfo.userId,function(result,password){
-			switch(result){
-				case 0:
-					res.writeHead(200);
-					res.end('OK');
-					var mailTemplate=Config.mailTemplate.resetPassword;
-					var mailArgs={
-						'username': actionInfo.username,
-						'password': password
-					};
-					mailer.sendMail({
-						'from': Config.mailCheckSender,
-						'to': result.email,
-						'subject': renderTemplate(mailTemplate.subject,mailArgs),
-						'text': renderTemplate(mailTemplate.contextText,mailArgs),
-						'html': renderTemplate(mailTemplate.contextHTML,mailArgs)
-					});
-					debug('[/v1/resetPassword] code %s: %j',fields.code,mailArgs);
-				break;
-				case -2:
-					res.writeHead(200);
-					res.end('not exists');
-					debug('[/v1/resetPassword] code %s: userId %d 不存在',fields.code,actionInfo.userId);
-				break;
-				case -1:
-					res.writeHead(500);
-					res.end();
-				break;
-			}
+		user.resetPassword(actionInfo.userId,function(password){
+			res.end('OK');
+			let mailTemplate=config.mailTemplate.resetPassword;
+			let mailArgs={
+				'username': actionInfo.username,
+				'password': password
+			};
+			mailer.sendMail({
+				'from': config.mailCheckSender,
+				'to': result.email,
+				'subject': renderTemplate(mailTemplate.subject,mailArgs),
+				'text': renderTemplate(mailTemplate.contextText,mailArgs),
+				'html': renderTemplate(mailTemplate.contextHTML,mailArgs)
+			});
 		});
 	});
 });
@@ -120,54 +91,48 @@ router.post('/v1/register',function(req,res){
 		'maxFields': 3,
 	}).parse(req,function(error,fields,files){
 		if(error || !(
-			fields.hasOwnProperty('username')
-			&& fields.hasOwnProperty('email')
-			&& fields.hasOwnProperty('password')
+			fields.hasOwnProperty('username') && user.fieldCheck.username(fields.username) &&
+			fields.hasOwnProperty('email') && user.fieldCheck.email(fields.email) &&
+			fields.hasOwnProperty('password') && (fields.password=toBuffer(fields.password)) && user.fieldCheck.password(fields.password)
 		)){
 			res.writeHead(400);
 			res.end();
 			return;
 		}
-		DB.checkUserExists(fields.username,fields.email,function(error,result){
-			if(error){
-				res.writeHead(500);
-				res.end();
-				return;
+		if(keepUsername.has(fields.username)){
+			res.end('username');
+			return;
+		}
+		user.checkExists(fields.username,fields.email,function(result){
+			if(result=='username' || result=='username,email'){
+				res.end('username');
+			}else if(result=='email'){
+				res.end('email');
+			}else{
+				let code=genCode();
+				let regInfo={
+					'action': 'register',
+					'timeout': Date.now()+config.mailTimeout,
+					'username': fields.username,
+					'email': fields.email,
+					'password': fields.password
+				};
+				let mailTemplate=config.mailTemplate.register;
+				let mailArgs={
+					'username': fields.username,
+					'code': code
+				};
+				mailer.sendMail({
+					'from': config.mailSender,
+					'to': fields.email,
+					'subject': renderTemplate(mailTemplate.subject,mailArgs),
+					'text': renderTemplate(mailTemplate.contentText,mailArgs),
+					'html': renderTemplate(mailTemplate.contentHTML,mailArgs)
+				});
+				codeList.set(code,regInfo);
+				keepUsername.add(regInfo.username);
+				res.end('OK');
 			}
-			if(result.length){
-				if(result[0].username==fields.username){
-					res.end('username');
-					debug('[/v1/register] 帳號 %s 已存在',fields.username);
-				}else if(result[0].email==fields.email){
-					res.end('email');
-					debug('[/v1/register] 信箱 %s 已存在',fields.email);
-				}
-				return;
-			}
-			var code=genCode(42);
-			var resetInfo={
-				'action': 'register',
-				'timeout': Math.floor(Date.now()/1000)+Config.mailTimeout,
-				'username': fields.username,
-				'email': fields.email,
-				'password': fields.password
-			};
-			var mailTemplate=Config.mailTemplate.checkMail;
-			var mailArgs={
-				'username': fields.username,
-				'code': code
-			};
-			mailer.sendMail({
-				'from': Config.mailSender,
-				'to': fields.email,
-				'subject': renderTemplate(mailTemplate.subject,mailArgs),
-				'text': renderTemplate(mailTemplate.contentText,mailArgs),
-				'html': renderTemplate(mailTemplate.contentHTML,mailArgs)
-			});
-			codeList.set(code,resetInfo);
-			res.writeHead(200);
-			res.end('OK');
-			debug('[/v1/register] 等待信箱驗證: %j',resetInfo);
 		});
 	});
 });
@@ -183,54 +148,37 @@ router.post('/v1/mail',function(req,res){
 			return;
 		}
 		if(!codeList.has(fields.code)){
-			res.writeHead(200);
 			res.end('not exists');
 			return;
 		}
-		var actionInfo=codeList.get(fields.code);
+		let actionInfo=codeList.get(fields.code);
 		codeList.delete(fields.code);
-		switch(actionInfo.action){
-			case 'register':
-				User.register(actionInfo.username,actionInfo.password,actionInfo.email,function(result){
-					switch(result){
-						case 0:
-							res.writeHead(500);
-							res.end();
-						break;
-						case -1:
-						case -2:
-						case -3:
-							console.error('[HTTP] /v1/mail，操作 register 於已檢查的資料被確認出不合法！')
-							res.writeHead(500);
-							res.end();
-						break;
-						case -11:
-							res.writeHead(200);
-							res.end('username');
-						break;
-						case -12:
-							res.writeHead(200);
-							res.end('email');
-						break;
-						default:
-							res.writeHead(200);
-							res.end('OK');
-					}
-				});
-			break;
-			default:
-				console.error('[HTTP] /v1/mail 未知的操作 %s',actionInfo.action);
-				res.writeHead(500);
-			res.end();
+		if(actionInfo.action=='register'){
+			keepUsername.delete(actionInfo.username);
+			user.createUser(actionInfo.username,actionInfo.password,actionInfo.email,function(result){
+				if(result=='username' || result=='username,email'){
+					res.end('username');
+				}else if(result=='email'){
+					res.end('email');
+				}else{
+					res.end('OK');
+				}
+			});
+		}else if(actionInfo.action=='updateEmail'){
+			user.updateProfile(actionInfo.userId,{'email': actionInfo.email},function(){
+				res.end('OK');
+			});
 		}
 	});
 });
-if(process.env.NODE_DEBUG) router.get('/v1/status',function(req,res){
+if(config.debug) router.get('/v1/status',function(req,res){
+	let db=require('./db.js');
 	res.setHeader('Content-Type','text/plain; charset=utf-8');
 	
-	res.write(util.format('在線人數: %d / %d\n',User.userList.length,Config.userMax));
+	res.write(util.format('連線數: %d / %d\n',user.sessionCount,config.sessionMax));
+	res.write(util.format('使用者: %d\n',user.userCount));
 	res.write(util.format('記憶體: %d KB\n',Math.ceil(process.memoryUsage().rss/1024)));
-	res.write(util.format('記錄寫入快取: %d\n',DB.chatLogCacheCount()));
+	res.write(util.format('記錄寫入快取: %d\n',db.chatLogCacheCount()));
 	
 	res.write(util.format('\n驗證代碼列表: (共計 %d 筆)\n',codeList.size));
 	for(let code of codeList){
@@ -239,7 +187,7 @@ if(process.env.NODE_DEBUG) router.get('/v1/status',function(req,res){
 			code[0],
 			code[1].action,
 			code[1].username,
-			new Date(code[1].timeout*1000).toLocaleString()
+			new Date(code[1].timeout).toLocaleString()
 		));
 	}
 	
@@ -247,17 +195,17 @@ if(process.env.NODE_DEBUG) router.get('/v1/status',function(req,res){
 });
 
 function clearCode(){
-	let now=Math.floor(Date.now()/1000);
+	let now=Date.now();
 	for(let codeInfo of codeList){
-		if(codeInfo[1].timeout<now)
+		if(codeInfo[1].timeout<now){
 			codeList.delete(codeInfo[0]);
+			if(codeInfo[1].action=='register')
+				keepUsername.delete(codeInfo[1].username);
+		}
 	}
 }
-function genCode(len){
-	var code='';
-	while(code.length<len)
-		code+=codeChar.charAt(Math.floor(Math.random()*codeChar.length));
-	return code;
+function genCode(){
+	return crypto.randomBytes(20).toString('hex');
 }
 function renderTemplate(template,args){
 	if(!template) return undefined;
@@ -271,19 +219,46 @@ function allowPost(req,res){
 	res.setHeader('Access-Control-Max-Age',86400);
 	res.end();
 }
+function toBuffer(hex){
+	return util.isString(hex) && /^[0-9a-f]+$/i.test(hex) && new Buffer(hex,'hex');
+}
 
-module.exports=function(req,res){
-	let domain=domainCreate();
-	domain.add(req);
-	domain.add(res);
-	domain.on('error',function(error){
-		debug(error);
-		res.socket.destroy();
-	});
-	domain.enter();
+module.exports={
+	'createUpdateEmail': function(userId,username,email){
+		let code=genCode();
+		let updateInfo={
+			'action': updateEmail,
+			'userId': userId,
+			'email': email
+		}
+		let mailTemplate=config.mailTemplate.updateEmail;
+		let mailArgs={
+			'username': username,
+			'code': code
+		};
+		mailer.sendMail({
+			'from': config.mailSender,
+			'to': result.email,
+			'subject': renderTemplate(mailTemplate.subject,mailArgs),
+			'text': renderTemplate(mailTemplate.contentText,mailArgs),
+			'html': renderTemplate(mailTemplate.contentHTML,mailArgs)
+		});
+		codeList.set(code,updateInfo);
+	},
+	'request': function(req,res){
+		let domain=domainCreate();
+		domain.add(req);
+		domain.add(res);
+		domain.on('error',function(error){
+			console.error(error.stack);
+			res.writeHead(500);
+			res.end();
+		});
+		domain.enter();
 	
-	if(req.headers['origin']) res.setHeader('Access-Control-Allow-Origin',req.headers['origin']);
-	router(req,res);
+		if(req.headers['origin']) res.setHeader('Access-Control-Allow-Origin',req.headers['origin']);
+		router(req,res);
 	
-	domain.exit();
-};
+		domain.exit();
+	}
+}
