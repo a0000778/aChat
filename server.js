@@ -1,84 +1,74 @@
 'use strict';
-var Http=require('http');
-var Https=require('https');
-var WebSocket=require('websocket');
-var Channel=require('./Channel.js');
-var Config=require('./Config.js');
-var DB=require('./DB.js');
-var User=require('./User.js');
+var channel=require('./channel.js');
+var config=require('./config.js');
+var db=require('./db.js');
+var http=require('http');
+var https=require('https');
+var aChat=require('./package.json');
+var user=require('./user.js');
+var webSocket=require('websocket');
 
 process.title='aChat - 聊天室伺服器';
-console.log('aChat v2.0.0 by a0000778');
-console.log('MIT Licence');
+console.log('aChat v%s by a0000778',aChat.version);
+console.log(aChat.licence);
 
 var serverLock=false;
-if(Config.ssl)
-	var web=Https.createServer(Config.ssl);
+if(config.ssl)
+	var httpServer=https.createServer(config.ssl);
 else
-	var web=Http.createServer();
-var socket=new WebSocket.server();
+	var httpServer=http.createServer();
+var wsServer=new webSocket.server();
 
-web.on('request',require('./http.js'));
-web.on('close',function(){
-	User.exit(1001);
-});
-socket.mount({
-	'httpServer': web
+httpServer
+	.on('request',require('./http.js').request)
+	.on('close',() => user.exit(1001))
+;
+wsServer.mount({
+	'httpServer': httpServer
 });
 
-socket.on('request',function(req){
-	if(req.requestedProtocols.indexOf('adminv1')>=0){
-		new User(req.accept('adminv1',req.origin));
-		return;
-	}
-	if(serverLock){
+wsServer.on('request',function(req){
+	if(req.requestedProtocols.indexOf('adminv1')!==-1)
+		user.createLink(req.accept('adminv1',req.origin));
+	else if(serverLock)
 		req.reject(4001,'Server locked.');
-		return;
-	}
-	if(User.userList.length>=Config.userMax){
+	else if(user.sessionCount>=config.sessionMax)
 		req.reject(4002,'Server overload.');
-		return;
-	}
-	if(req.requestedProtocols.indexOf('chatv1')>=0)
-		new User(req.accept('chatv1',req.origin));
+	else if(req.requestedProtocols.indexOf('chatv1')>=0)
+		user.createLink(req.accept('chatv1',req.origin));
 	else
 		req.reject(404,'Not supported protocol.');
 });
 
 console.log('載入頻道列表...');
-DB.getAllChannel(function(error,result){
+channel.loadAll(function(error){
 	if(error){
 		console.log('頻道列表載入失敗');
 		process.exit();
 	}
-	result.forEach(function(channel){
-		new Channel(channel.channelId,channel.name);
-	});
-	if(!Channel.findById(Config.channelDefault)){
+	if(!channel.findById(config.channelDefault)){
 		console.log('預設頻道不存在！');
 		process.exit();
 	}
-	console.log('頻道列表載入完畢！共計 %d 個頻道',result.length);
 	console.log('啟動伺服器...');
-	web.listen(Config.port,function(e){
-		if(e){
+	httpServer.listen(config.port,function(error){
+		if(error){
 			console.log('伺服器啟動失敗');
-			console.log(e);
+			console.log(error);
 			process.exit();
 		}else{
-			console.log('伺服器已啟動');
+			console.log('啟動完畢');
 			process.once('SIGINT',function(){
-				process.on('SIGINT',function(){
-					console.log('伺服器關閉中，請稍後');
-				});
+				process.on('SIGINT',() => console.log('伺服器關閉中 ...'));
 				serverLock=true;
-				User.exit(1001);
-				web.close();
-				DB.writeChatLogNow(true);
+				user.exit(1001);
+				httpServer.close();
+				db.writeChatLogNow(true);
 				setInterval(function(){
-					if(!DB.chatLogCacheCount())
+					let chatLogCacheCount=db.chatLogCacheCount();
+					if(!chatLogCacheCount)
 						process.exit();
-					console.log('等待聊天記錄完全寫出...')
+					console.log('等待聊天記錄完全寫出 (剩餘 %d) ...',chatLogCacheCount);
 				},1000);
 			});
 		}
