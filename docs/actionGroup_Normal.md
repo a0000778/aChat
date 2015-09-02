@@ -86,7 +86,7 @@
 	* `userId` (Number) 使用者ID
 	* `username` (String) 帳號
 	* `email` (String) 信箱(僅查詢目標為自己時)
-	* `regTime` (Number) 註冊時間的 Unix Time
+	* `regTime` (Number) 註冊時間的 Unix Time(ms)
 
 ##### 查詢失敗
 返回以下格式資料
@@ -97,11 +97,11 @@
 	* `userId` (Number) 使用者ID
 
 ### user_editProfile
-修改自己的使用者資料
+以 Hmac驗證方法 進行密碼驗證，修改自己的使用者資料
 #### 參數
-* `password` (String) 登入密碼，建議先將原始密碼做一次 128 位元以上的 hash 後送出，最短32個字
+* `answer` (Hex) 32 Bytes SHA256 Hash 答案
 * `email` (String,選擇性) 設定新 E-amil
-* `newPassword` (String,選擇性) 設定新登入密碼，建議先將原始密碼做一次 128 位元以上的 hash 後送出，最短32個字
+* `password` (Hex,選擇性) 設定新登入密碼，32 Bytes 經過 SHA256 Hash 的密碼
 
 #### 返回結果
 ##### 成功
@@ -116,19 +116,13 @@
 * `action` (String) user_editProfile
 * `status` (String) auth fail
 
-##### 失敗 - 其他原因
-返回以下指令
-
-* `action` (String) user_editProfile
-* `status` (String) fail
-
 ### user_logout
 登出
 #### 參數
 無
 
 #### 返回結果
-自動進行頻道退出，並以狀態碼 `1000` 斷線處理。
+以狀態碼 `1000` 斷線處理。
 
 ## 伺服端主動發送指令列表
 ### channel_exit
@@ -161,7 +155,7 @@
 #### 欄位
 * `action` (String) chat_global
 * `msg` (String) 訊息內容
-* `time` (Number) 發送時間 (Unix Time)
+* `time` (Number) 發送時間的 Unix Time (ms)
 
 ### chat_normal
 使用者所在頻道有新的訊息
@@ -169,14 +163,14 @@
 * `action` (String) chat_normal
 * `fromUserId` (Number) 發言者ID
 * `msg` (String) 訊息內容
-* `time` (Number) 發送時間 (Unix Time)
+* `time` (Number) 發送時間的 Unix Time (ms)
 
 ### chat_notice
 伺服器提示訊息
 #### 欄位
 * `action` (String) chat_global
 * `msg` (String) 訊息內容
-* `time` (Number) 發送時間 (Unix Time)
+* `time` (Number) 發送時間的 Unix Time (ms)
 
 ### chat_private
 有發送給使用者或由使用者發送的密頻訊息
@@ -185,4 +179,4 @@
 * `fromUserId` (Number) 發言者ID
 * `toUserId` (Number) 目標使用者ID
 * `msg` (String) 訊息內容
-* `time` (Number) 發送時間 (Unix Time)
+* `time` (Number) 發送時間的 Unix Time (ms)

@@ -31,7 +31,7 @@
 ## 資料欄位
 * `username` 登入帳號，亦為顯示名稱
 * `email`
-* `password`
+* `password` 32 Bytes 經過 SHA256 Hash 的密碼
 
 ## 返回資訊
 * `OK` 成功

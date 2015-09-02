@@ -10,7 +10,6 @@
 * `action` (String) channel_create
 * `status` (String)
 	* success - 新增成功
-	* fail - 新增失敗
 
 ###channel_edit
 修改頻道選項
@@ -22,7 +21,6 @@
 * `action` (String) channel_edit
 * `status` (String)
 	* success - 修改成功
-	* fail - 修改失敗
 	* not exists - 修改目標不存在
 
 ※沒有任何修改項目時將不傳回任何結果
@@ -36,7 +34,6 @@
 * `action` (String) channel_delete
 * `status` (String)
 	* success - 刪除成功
-	* fail - 刪除失敗
 	* not exists - 刪除目標不存在
 	* default channel - 刪除目標為預設頻道
 	* default channel not exists - 預設頻道不存在，無法進行頻道刪除動作
@@ -61,7 +58,6 @@
 * `action` (String) user_ban
 * `status` (String)
 	* success - 成功
-	* fail - 失敗
 	* not exists - 目標不存在
 
 ###user_unban
@@ -73,7 +69,6 @@
 * `action` (String) user_unban
 * `status` (String)
 	* success - 成功
-	* fail - 失敗
 	* not exists - 目標不存在
 
 ###chat_global
