@@ -57,6 +57,19 @@ channel.loadAll(function(error){
 			console.log(error);
 			process.exit();
 		}else{
+			process.on('uncaughtException',function(e){
+				console.error(e.stack);
+				serverLock=true;
+				user.exit(4003);
+				httpServer.close();
+				db.writeChatLogNow(true);
+				setInterval(function(){
+					let chatLogCacheCount=db.chatLogCacheCount();
+					if(!chatLogCacheCount)
+						process.exit();
+					console.log('等待聊天記錄完全寫出 (剩餘 %d) ...',chatLogCacheCount);
+				},1000);
+			});
 			console.log('啟動完畢');
 			process.once('SIGINT',function(){
 				process.on('SIGINT',() => console.log('伺服器關閉中 ...'));
