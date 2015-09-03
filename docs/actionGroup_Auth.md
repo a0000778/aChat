@@ -6,14 +6,14 @@
 ### createSession
 以 Hmac驗證方法 進行密碼驗證，建立 session
 #### 參數
-* username (String) 登入帳號
-* answer (Hex) 32 Bytes SHA256 Hmac 答案
+* `username` (String) 登入帳號
+* `answer` (Hex) 32 Bytes SHA256 Hmac 答案
 
 #### 返回結果
 ##### 建立成功
-* action (String) createSession
-* userId (Number) session 所屬 userId
-* session (Hex) 20 Bytes 的 session
+* `action` (String) createSession
+* `userId` (Number) session 所屬 userId
+* `session` (Hex) 20 Bytes 的 session
 
 ##### 驗證失敗 - 帳號停用中
 以狀態碼 `4101` 斷線處理。
@@ -27,8 +27,8 @@
 ### authBySession
 以 session 驗證
 #### 參數
-* userId (Number) session 所屬 userId
-* session (Hex) 20 Bytes 的 session
+* `userId` (Number) session 所屬 userId
+* `session` (Hex) 20 Bytes 的 session
 
 #### 返回結果
 ##### 驗證成功
