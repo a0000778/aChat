@@ -191,6 +191,13 @@ user.getProfile=function(userId,callback){
 		callback(result);
 	});
 }
+user.listSession=function(){
+	let list=[];
+	for(let u of sessionList){
+		list.push(u);
+	}
+	return list;
+}
 user.listUser=function(){
 	let list=[];
 	for(let u of userListById.values()){
