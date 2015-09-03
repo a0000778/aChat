@@ -89,7 +89,7 @@ var db={};
 	db.createUser=function(username,password,email,active,callback){
 		pool.query(
 			'INSERT INTO `user` (`username`,`password`,`email`,`active`,`regTime`) VALUES (?);',
-			[[info.username,info.password,info.email,info.active,new Date]],
+			[[username,password,email,active,new Date]],
 			function(error,result){
 				if(error) throw error;
 				callback(result.insertId);

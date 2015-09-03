@@ -135,15 +135,7 @@ user.createUser=function(username,password,email,callback){
 			callback(result);
 			return;
 		}
-		db.createUser(
-			{
-				'username': username,
-				'password': password,
-				'email': email,
-				'active': true
-			},
-			callback
-		);
+		db.createUser(username,password,email,true,callback);
 	});
 }
 /*
