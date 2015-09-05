@@ -189,10 +189,7 @@ var db={};
 		}
 		pool.query('UPDATE `user` SET ? WHERE `userId`=?;',[userData,userId],function(error,result){
 			if(error) throw error;
-			if(result.changeRows)
-				callback(undefined);
-			else
-				throw new Error('userId not exists');
+				callback();
 		});
 	}
 })(db);
