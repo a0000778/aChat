@@ -230,14 +230,19 @@ user.resetPassword=function(userId,callback){
 user.updateProfile=function(userId,userData,callback){
 	if(!fieldCheck.userId(userId))
 		throw new Error('field format error');
+	let fieldCount=0;
 	for(let field in userData){
 		if(
 			['userId','username','session','question','answer'].indexOf(field)!==-1 || 
-			!(fieldCheck.hasOwnPorperty(field) && fieldCheck[field](userData[field]))
+			!(fieldCheck.hasOwnProperty(field) && fieldCheck[field](userData[field]))
 		)
 			throw new Error('field format error');
+		fieldCount++;
 	}
-	db.updateUserData(userId,userData,callback);
+	if(fieldCount)
+		db.updateUserData(userId,userData,callback);
+	else
+		throw new Error('no update field');
 }
 
 function Link(link){
