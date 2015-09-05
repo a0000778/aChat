@@ -173,16 +173,16 @@ Normal.prototype.user_getProfile=function(data,link){
 }
 Normal.prototype.user_editProfile=function(data,link){
 	if(!(
-		this._question && 
-		data.hasOwnProperty('password') && (data.password=Base.toBuffer(data.password)) && user.checkfield.password(data.password)
+		this._link._question && 
+		data.hasOwnProperty('password') && (data.password=Base.toBuffer(data.password)) && user.fieldCheck.password(data.password)
 	)) return;
 	var userData={}
 	for(let field in data){
 		if(field=='action' || field=='password')
 			continue;
-		else if(field=='password' && (userData.newPassword=Base.toBuffer(data.password)) && user.checkfield.password(userData.password))
+		else if(field=='password' && (userData.newPassword=Base.toBuffer(data.password)) && user.fieldCheck.password(userData.password))
 			continue;
-		else if(field=='email' && user.checkfield.email(data.email)){
+		else if(field=='email' && user.fieldCheck.email(data.email)){
 			userData.email=data.email;
 			continue;
 		}else return;

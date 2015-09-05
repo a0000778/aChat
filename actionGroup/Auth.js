@@ -22,9 +22,9 @@ Auth.prototype._umount=function(){
 Auth.timeout= (link) => link.exit(4100);
 Auth.prototype.createSession=function(data){
 	if(this._authing || !(
-		this._question && 
-		data.hasOwnProperty('username') && user.checkfield.username(data.username) &&
-		data.hasOwnProperty('answer') && (data.answer=Base.toBuffer(data.answer)) && user.checkfield.answer(data.answer)
+		this._link._question && 
+		data.hasOwnProperty('username') && user.fieldCheck.username(data.username) &&
+		data.hasOwnProperty('answer') && (data.answer=Base.toBuffer(data.answer)) && user.fieldCheck.answer(data.answer)
 	)) return;
 	var _=this;
 	let question=this._question;
@@ -53,8 +53,8 @@ Auth.prototype.createSession=function(data){
 }
 Auth.prototype.authBySession=function(data){
 	if(this._authing || !(
-		data.hasOwnProperty('userId') && user.checkfield.userId(data.userId) &&
-		data.hasOwnProperty('session') && (data.session=Base.toBuffer(data.session)) && user.checkfield.session(data.session)
+		data.hasOwnProperty('userId') && user.fieldCheck.userId(data.userId) &&
+		data.hasOwnProperty('session') && (data.session=Base.toBuffer(data.session)) && user.fieldCheck.session(data.session)
 	)) return;
 	var _=this;
 	this._authing=true;
