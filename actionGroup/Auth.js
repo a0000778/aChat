@@ -65,7 +65,7 @@ Auth.prototype.authBySession=function(data){
 			_._link.exit(4102);
 		else{
 			_._link.send({
-				'action': 'auth',
+				'action': 'authBySession',
 				'status': 'success',
 				'userId': data.userId
 			});
