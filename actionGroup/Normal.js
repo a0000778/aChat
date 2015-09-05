@@ -188,7 +188,7 @@ Normal.prototype.user_editProfile=function(data,link){
 		}else return;
 	}
 	var _=this;
-	user.authByPassword(this._user.username,this._question,data.answer,function(result){
+	user.authByPassword(this._user.username,this._link._question,data.answer,function(result){
 		if(result=='disabled')
 			_._user.exit(4101);
 		else if(result=='fail')

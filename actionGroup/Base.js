@@ -4,7 +4,6 @@ var crypto=require('crypto');
 
 function Base(user){
 	this._user=user;
-	this._question=null;
 }
 Base.toBuffer=function(hex){
 	return util.isString(hex) && /^[0-9a-f]+$/i.test(hex) && new Buffer(hex,'hex');
@@ -31,11 +30,11 @@ Base.prototype._umount=function(){
 	this._user=null;
 }
 Base.prototype.createQuestion=function(data){
-	if(!this._question)
-		this._question=crypto.randomBytes(8);
-	this._user.send({
+	if(!this._link._question)
+		this._link._question=crypto.randomBytes(8);
+	this._link.send({
 		'action': 'question',
-		'question': this._question.toString('hex')
+		'question': this._link._question.toString('hex')
 	});
 }
 

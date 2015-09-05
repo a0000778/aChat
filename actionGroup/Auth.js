@@ -27,9 +27,9 @@ Auth.prototype.createSession=function(data){
 		data.hasOwnProperty('answer') && (data.answer=Base.toBuffer(data.answer)) && user.fieldCheck.answer(data.answer)
 	)) return;
 	var _=this;
-	let question=this._question;
+	let question=this._link._question;
 	this._authing=true;
-	this._question=null;
+	this._link._question=null;
 	user.authByPassword(data.username,question,data.answer,function(result){
 		if(result=='disabled')
 			_._link.exit(4101);

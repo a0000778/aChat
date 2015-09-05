@@ -260,6 +260,7 @@ function Link(link){
 	this.user=null;
 	this.session=null;
 	this.link=link;
+	this._question=null;
 	var auth=new actionGroup.Auth(this);
 	
 	link
