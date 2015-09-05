@@ -175,14 +175,14 @@ Normal.prototype.user_getProfile=function(data,link){
 }
 Normal.prototype.user_editProfile=function(data,link){
 	if(!(
-		this._link._question && 
-		data.hasOwnProperty('password') && (data.password=Base.toBuffer(data.password)) && user.fieldCheck.password(data.password)
+		link._question && 
+		data.hasOwnProperty('answer') && (data.answer=Base.toBuffer(data.answer)) && user.fieldCheck.answer(data.answer)
 	)) return;
 	var userData={}
 	for(let field in data){
-		if(field=='action' || field=='password')
+		if(field=='action' || field=='answer')
 			continue;
-		else if(field=='password' && (userData.newPassword=Base.toBuffer(data.password)) && user.fieldCheck.password(userData.password))
+		else if(field=='password' && (userData.password=Base.toBuffer(data.password)) && user.fieldCheck.password(userData.password))
 			continue;
 		else if(field=='email' && user.fieldCheck.email(data.email)){
 			userData.email=data.email;
@@ -203,12 +203,18 @@ Normal.prototype.user_editProfile=function(data,link){
 				createUpdateEmail(_._user.userId,_._user.username,userData.email);
 				delete userData.email;
 			}
-			user.updateProfile(_._user.userId,userData,function(){
+			if(Object.keys(userData).length)
+				user.updateProfile(_._user.userId,userData,function(){
+					link.send({
+						'action': 'user_editProfile',
+						'status': 'success'
+					});
+				});
+			else
 				link.send({
 					'action': 'user_editProfile',
 					'status': 'success'
 				});
-			});
 		}
 	});
 }
