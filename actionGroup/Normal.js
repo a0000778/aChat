@@ -1,6 +1,7 @@
 'use strict';
 var Base=require('./Base.js');
 var channel=require('../channel.js');
+var config=require('../config.js')
 var db=require('../db.js');
 var createUpdateEmail=require('../http.js').createUpdateEmail;
 var user=require('../user.js');
