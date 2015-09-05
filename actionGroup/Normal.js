@@ -26,9 +26,9 @@ Normal.prototype.channel_list=function(data,link,list){
 }
 Normal.prototype.channel_switch=function(data,link){
 	if(!(Number.isSafeInteger(data.channelId) && data.channelId>0)) return;
-	let channel=channel.findById(data.channelId);
-	if(channel){
-		if(channel.join(this._user)){
+	let ch=channel.findById(data.channelId);
+	if(ch){
+		if(ch.join(this._user)){
 			this._user.send({
 				'action': 'channel_switch',
 				'status': 'success',
@@ -50,9 +50,10 @@ Normal.prototype.channel_switch=function(data,link){
 	}
 }
 Normal.prototype.channel_userList=function(data,link,channelId,list){
+	let ch,userList;
 	if(data.hasOwnProperty('channelId')){
 		if(!(Number.isSafeInteger(data.channelId) && data.channelId>0)) return;
-		let ch=channel.findById(data.channelId);
+		ch=channel.findById(data.channelId);
 		if(!ch){
 			link.send({
 				'action': 'channel_userList',
@@ -61,8 +62,8 @@ Normal.prototype.channel_userList=function(data,link,channelId,list){
 			return;
 		}
 	}else{
-		let ch=this._user.channel;
-		let userList=[];
+		ch=this._user.channel;
+		userList=[];
 		for(let u of ch.list())
 			userList.push(u.userId);
 	}
