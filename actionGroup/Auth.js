@@ -40,7 +40,7 @@ Auth.prototype.createSession=function(data){
 				_._user.exit(4102);
 				return;
 			}
-			user.createSession(userId,function(session){
+			user.createSession(result.userId,function(session){
 				_._link.send({
 					'action': 'createSession',
 					'userId': result.userId,
