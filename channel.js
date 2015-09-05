@@ -46,13 +46,13 @@ Channel.prototype.delete=function(callback){
 		throw new Error('channel not empty')
 	var _=this;
 	db.deleteChannel(this.channelId,function(){
-		channelList.remove(_.channelId);
+		channelList.delete(_.channelId);
 		callback();
 	});
 }
 Channel.prototype.exit=function(user){
 	if(this.onlineList.has(user)){
-		this.onlineList.remove(user);
+		this.onlineList.delete(user);
 		user.channel=null;
 		this.send({
 			'action': 'channel_exit',
@@ -83,7 +83,7 @@ Channel.prototype.list=function(){
 Channel.prototype.send=function(data){
 	if(!(Buffer.isBuffer(data) || typeof(data)==='string'))
 		data=JSON.stringify(data);
-	for(let client of channelList.values())
+	for(let client of this.onlineList)
 		client.send(data);
 	return this;
 }
