@@ -16,7 +16,7 @@ const fieldCheck={
 	'actionGroup': (name) => util.isString(name) && actionGroup.hasOwnProperty(name),
 	'session': (session) => util.isBuffer(session) && session.length===20,
 	//臨時資料
-	'question': (question) => util.isBuffer(question) && question.length>8,
+	'question': (question) => util.isBuffer(question) && question.length>7,
 	'answer': (answer) => Buffer.isBuffer(answer) && answer.length===32
 };
 var user={};
