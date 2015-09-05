@@ -139,7 +139,7 @@ Admin.prototype.user_unban=function(data){
 Admin.prototype.chat_global=function(data){
 	if(!(data.hasOwnProperty('msg') && data.msg.length)) return;
 	if(user.fieldCheck.userId(data.userId)){
-		let u=user.findById(data.userId);
+		let u=user.findUser('userId',data.userId);
 		if(u){
 			user.send({
 				'action': 'chat_global',

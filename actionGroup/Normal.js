@@ -100,7 +100,7 @@ Normal.prototype.chat_private=function(data,link){
 		Number.isSafeInteger(data.toUserId) && data.toUserId>0 && 
 		util.isString(data.msg) && data.msg.length
 	)) return;
-	var target=user.findById(data.toUserId);
+	var target=user.findUser('userId',data.toUserId);
 	if(target){
 		if(this._quota_sendMsg<=0){
 			link.send({
