@@ -102,7 +102,7 @@ var db={};
 			- session	Buffer
 	*/
 	db.createSession=function(userId,callback){
-		var session=crypto.randomBytes(16)
+		var session=crypto.randomBytes(20);
 		pool.query(
 			'INSERT INTO `session` (`session`,`userId`,`createTime`) VALUES (?);',
 			[[session,userId,new Date()]],
