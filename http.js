@@ -227,8 +227,10 @@ module.exports={
 	'createUpdateEmail': function(userId,username,email){
 		let code=genCode();
 		let updateInfo={
-			'action': updateEmail,
+			'action': 'updateEmail',
+			'timeout': Date.now()+config.mailTimeout,
 			'userId': userId,
+			'username': username,
 			'email': email
 		}
 		let mailTemplate=config.mailTemplate.updateEmail;
@@ -238,7 +240,7 @@ module.exports={
 		};
 		mailer.sendMail({
 			'from': config.mailSender,
-			'to': result.email,
+			'to': email,
 			'subject': renderTemplate(mailTemplate.subject,mailArgs),
 			'text': renderTemplate(mailTemplate.contentText,mailArgs),
 			'html': renderTemplate(mailTemplate.contentHTML,mailArgs)
