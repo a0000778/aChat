@@ -340,10 +340,10 @@ User.prototype.send=function(data){
 function passwordHash(password){
 	return crypto.createHash('sha256').update(
 		crypto.createHash('md5').update(password).digest()
-	).update(password).digest('hex');
+	).update(password).digest();
 }
 function passwordHmac(question,password){
-	return crypto.createHmac('sha256',password).update(question).digest('hex');
+	return crypto.createHmac('sha256',password).update(question).digest();
 }
 
 module.exports=Object.freeze(user);
