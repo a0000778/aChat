@@ -173,24 +173,59 @@ router.post('/v1/mail',function(req,res){
 });
 if(config.debug) router.get('/v1/status',function(req,res){
 	let db=require('./db.js');
-	res.setHeader('Content-Type','text/plain; charset=utf-8');
+	let channel=require('./channel.js');
+	let outputContent='';
 	
-	res.write(util.format('連線數: %d / %d\n',user.sessionCount,config.sessionMax));
-	res.write(util.format('使用者: %d\n',user.userCount));
-	res.write(util.format('記憶體: %d KB\n',Math.ceil(process.memoryUsage().rss/1024)));
-	res.write(util.format('記錄寫入快取: %d\n',db.chatLogCacheCount()));
+	outputContent+=util.format('連線數: %d / %d\n',user.sessionCount,config.sessionMax);
+	outputContent+=util.format('使用者: %d\n',user.userCount);
+	outputContent+=util.format('記憶體: %d KB\n',Math.ceil(process.memoryUsage().rss/1024));
+	outputContent+=util.format('記錄寫入快取: %d\n',db.chatLogCacheCount());
 	
-	res.write(util.format('\n驗證代碼列表: (共計 %d 筆)\n',codeList.size));
+	outputContent+=util.format('\n頻道列表:\n');
+	for(let ch of channel.list())
+		outputContent+=util.format(
+			'%d: %s, lock=%j, userCount=%d / %d\n',
+			ch.channelId,
+			ch.name,
+			ch.lock,
+			ch.onlineList.size,
+			ch.onlineMax
+		);
+	
+	outputContent+=util.format('\n連線列表:\n');
+	for(let sess of user.listSession()){
+		let u=sess.user
+		if(u){
+			outputContent+=util.format(
+				'%s: userId=%d, session=%s, username=%s, actionGroup=%s, channel=%s(%d)\n',
+				sess.link.remoteAddress,
+				u.userId,
+				sess.session.toString('hex'),
+				u.username,
+				u.actionGroup.constructor.name,
+				u.channel && u.channel.name,
+				u.channel && u.channel.channelId
+			);
+		}else
+			outputContent+=util.format(
+				'%s: 未驗證\n',
+				sess.link.remoteAddress
+			);
+	}
+	
+	outputContent+=util.format('\n驗證代碼列表: (共計 %d 筆)\n',codeList.size);
 	for(let code of codeList){
-		res.write(util.format(
+		outputContent+=util.format(
 			'%s: action=%s, username=%s, timeout=%s\n',
 			code[0],
 			code[1].action,
 			code[1].username,
 			new Date(code[1].timeout).toLocaleString()
-		));
+		);
 	}
 	
+	res.setHeader('Content-Type','text/plain; charset=utf-8');
+	res.write(outputContent);
 	res.end();
 });
 
