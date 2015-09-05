@@ -167,7 +167,7 @@ user.send=function(data){
 user.findUser=function(field,value,allResultCallback){
 	let ret;
 	if(field=='userId' && fieldCheck.userId(value))
-		ret=userListByUserId.get(value);
+		ret=userListById.get(value);
 	else if(field=='username' && fieldCheck.username(value))
 		ret=userListByUsername.get(value);
 	else if(field=='email' && fieldCheck.email(value))
