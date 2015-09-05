@@ -67,8 +67,8 @@ user.authByPassword=function(username,question,answer,callback){
 user.authBySession=function(userId,session,link,callback){
 	if(!(fieldCheck.userId(userId) && fieldCheck.session(session)))
 		throw new Error('field format error');
-	db.getSession(session,function(session){
-		if(!session || session.userId!==userId)
+	db.getSession(session,function(result){
+		if(!result || result.userId!==userId)
 			callback('fail');
 		else if(userListById.has(userId)){
 			link._setUser(session,userListById.get(userId));
@@ -302,7 +302,7 @@ Link.prototype._setUser=function(session,userId,username,actionGroup){
 		this.user=new User(userId,username,actionGroup);
 	this.user.sessions.add(this);
 	this.link
-		.removeAllListener('message')
+		.removeAllListeners('message')
 		.on('message',function(data){
 			_.user.actionGroup._exec(data,_);
 		})
