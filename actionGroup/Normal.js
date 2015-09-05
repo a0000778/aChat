@@ -63,7 +63,7 @@ Normal.prototype.channel_userList=function(data,link,channelId,list){
 		let ch=this._user.channel;
 		let userList=[];
 		for(let u of ch.list())
-			userList.push({'userId':u.userId,'username':u.username});
+			userList.push(u.userId);
 	}
 	link.send({
 		'action': 'channel_userList',

@@ -31,9 +31,7 @@
 * `status` (String) success
 * `channelId` (Number) 請求的頻道ID
 * `list` (Array)
-	* (Object) 使用者
-		* `id` (Number) 使用者ID
-		* `username` (String) 使用者名稱
+	* `userId` (Number) 使用者ID
 
 ##### 查詢失敗 - 頻道不存在
 按以下格式返回。
