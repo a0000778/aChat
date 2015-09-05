@@ -1,6 +1,7 @@
 'use strict';
 var channel=require('../channel.js');
 var crypto=require('crypto');
+var util=require('util');
 
 function Base(user){
 	this._user=user;
