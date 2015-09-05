@@ -30,12 +30,12 @@ Base.prototype._execObject=function(data,link){
 Base.prototype._umount=function(){
 	this._user=null;
 }
-Base.prototype.createQuestion=function(data){
-	if(!this._link._question)
-		this._link._question=crypto.randomBytes(8);
-	this._link.send({
+Base.prototype.createQuestion=function(data,link){
+	if(!link._question)
+		link._question=crypto.randomBytes(8);
+	link.send({
 		'action': 'question',
-		'question': this._link._question.toString('hex')
+		'question': link._question.toString('hex')
 	});
 }
 

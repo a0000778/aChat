@@ -20,16 +20,16 @@ Auth.prototype._umount=function(){
 	Base.prototype._umount.call(this);
 }
 Auth.timeout= (link) => link.exit(4100);
-Auth.prototype.createSession=function(data){
+Auth.prototype.createSession=function(data,link){
 	if(this._authing || !(
-		this._link._question && 
+		link._question && 
 		data.hasOwnProperty('username') && user.fieldCheck.username(data.username) &&
 		data.hasOwnProperty('answer') && (data.answer=Base.toBuffer(data.answer)) && user.fieldCheck.answer(data.answer)
 	)) return;
 	var _=this;
-	let question=this._link._question;
+	let question=link._question;
 	this._authing=true;
-	this._link._question=null;
+	link._question=null;
 	user.authByPassword(data.username,question,data.answer,function(result){
 		if(result=='disabled')
 			_._link.exit(4101);
@@ -51,14 +51,14 @@ Auth.prototype.createSession=function(data){
 		}
 	});
 }
-Auth.prototype.authBySession=function(data){
+Auth.prototype.authBySession=function(data,link){
 	if(this._authing || !(
 		data.hasOwnProperty('userId') && user.fieldCheck.userId(data.userId) &&
 		data.hasOwnProperty('session') && (data.session=Base.toBuffer(data.session)) && user.fieldCheck.session(data.session)
 	)) return;
 	var _=this;
 	this._authing=true;
-	user.authBySession(data.userId,data.session,this._link,function(result){
+	user.authBySession(data.userId,data.session,link,function(result){
 		if(result=='disabled')
 			_._link.exit(4101);
 		else if(result=='fail')

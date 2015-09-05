@@ -268,7 +268,7 @@ function Link(link){
 			_.exit();
 		})
 		.on('message',function(data){
-			auth._exec(data);
+			auth._exec(data,_);
 		})
 	;
 	
