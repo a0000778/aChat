@@ -45,7 +45,7 @@ user.authByPassword=function(username,question,answer,callback){
 	if(!(fieldCheck.username(username) && fieldCheck.question(question) && fieldCheck.answer(answer)))
 		throw new Error('field format error');
 	db.getUserData('username',username,function(result){
-		if(result && Buffer.compare(passwordHmac(question,result.password),answer)){
+		if(result && !Buffer.compare(passwordHmac(question,result.password),answer)){
 			if(result.active)
 				callback(result);
 			else
