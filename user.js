@@ -71,16 +71,20 @@ user.authBySession=function(userId,session,link,callback){
 		if(!result || result.userId!==userId)
 			callback('fail');
 		else if(userListById.has(userId)){
-			link._setUser(session,userListById.get(userId));
-			callback('success');
+			db.updateSession(session,function(){
+				link._setUser(session,userListById.get(userId));
+				callback('success');
+			});
 		}else{
 			db.getUserData('userId',userId,function(result){
 				if(result){
 					if(link.link.protocol=='adminv1' && result.actionGroup!='Admin'){
 						callback('fail');
 					}else if(result.active){
-						link._setUser(session,userId,result.username,result.actionGroup);
-						callback('success');
+						db.updateSession(session,function(){
+							link._setUser(session,userId,result.username,result.actionGroup);
+							callback('success');
+						});
 					}else
 						callback('disabled');
 				}else{
