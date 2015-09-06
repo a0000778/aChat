@@ -77,6 +77,7 @@ Normal.prototype.channel_userList=function(data,link,channelId,list){
 Normal.prototype.chat_normal=function(data,link){
 	if(!(util.isString(data.msg) && data.msg.length)) return;
 	if(!this._user.channel) return;
+	let time=new Date();
 	if(this._quota_sendMsg<=0){
 		link.send({
 			'action': 'chat_notice',
@@ -86,7 +87,6 @@ Normal.prototype.chat_normal=function(data,link){
 		this._quota_sendMsg-=quota_sendMsg;
 		return;
 	}
-	let time=new Date();
 	this._quota_sendMsg--;
 	this._user.channel.send({
 		'action': 'chat_normal',
@@ -103,6 +103,7 @@ Normal.prototype.chat_private=function(data,link){
 	)) return;
 	var target=user.findUser('userId',data.toUserId);
 	if(target){
+		let time=new Date();
 		if(this._quota_sendMsg<=0){
 			link.send({
 				'action': 'chat_notice',
@@ -113,7 +114,6 @@ Normal.prototype.chat_private=function(data,link){
 			return;
 		}
 		this._quota_sendMsg--;
-		let time=new Date();
 		let sendData=JSON.stringify({
 			'action': 'chat_private',
 			'fromUserId': this._user.userId,
