@@ -315,7 +315,7 @@ function Link(link){
 Link.prototype.exit=function(code){
 	if(this.link.connected) this.link.close(code);
 	if(this.user){
-		this.user.sessions.delete(this);
+		this.user.sessions.delete(this.session.toString('hex'));
 		this.user._offline();
 	}
 	sessionList.delete(this);
