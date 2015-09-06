@@ -156,20 +156,18 @@ var db={};
 		- callback	Function
 	*/
 	db.updateSession=function(session,messageId,callback){
+		let sql,args;
 		if(!callback){
 			callback=messageId;
-			let sql='UPDATE `session` SET `lastTime`=? WHERE `session`=?;';
-			let args=[new Date(),session];
+			sql='UPDATE `session` SET `lastLogin`=? WHERE `session`=?;';
+			args=[new Date(),session];
 		}else{
-			let sql='UPDATE `session` SET `messageId`=?,`lastTime`=? WHERE `session`=?;';
-			let args=[messageId,new Date(),session];
+			sql='UPDATE `session` SET `messageId`=?,`lastLogin`=? WHERE `session`=?;';
+			args=[messageId,new Date(),session];
 		}
 		pool.query(sql,args,function(error,result){
 			if(error) throw error;
-			if(result.changeRows)
-				callback();
-			else
-				throw new Error('session not exists');
+			callback();
 		});
 	}
 	/*
