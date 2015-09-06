@@ -11,7 +11,6 @@ var actionGroup=require('../actionGroup.js');
 function Auth(link){
 	Base.call(this,undefined);
 	this._authing=false;
-	this._link=link;
 	this._timeout=setTimeout(Auth.timeout,10000,link);
 }
 util.inherits(Auth,Base);
@@ -32,16 +31,16 @@ Auth.prototype.createSession=function(data,link){
 	link._question=null;
 	user.authByPassword(data.username,question,data.answer,function(result){
 		if(result=='disabled')
-			_._link.exit(4101);
+			link.exit(4101);
 		else if(result=='fail')
-			_._link.exit(4102);
+			link.exit(4102);
 		else{
-			if(_._link.link.protocol=='adminv1' && result.actionGroup!='Admin'){
-				_._user.exit(4102);
+			if(link.link.protocol=='adminv1' && result.actionGroup!='Admin'){
+				link.exit(4102);
 				return;
 			}
 			user.createSession(result.userId,function(session){
-				_._link.send({
+				link.send({
 					'action': 'createSession',
 					'userId': result.userId,
 					'session': session.toString('hex')
@@ -60,21 +59,21 @@ Auth.prototype.authBySession=function(data,link){
 	this._authing=true;
 	user.authBySession(data.userId,data.session,link,function(result){
 		if(result=='disabled')
-			_._link.exit(4101);
+			link.exit(4101);
 		else if(result=='fail')
-			_._link.exit(4102);
+			link.exit(4102);
 		else if(result=='repeat login')
-			_._link.exit(4103);
+			link.exit(4103);
 		else{
-			_._link.send({
+			link.send({
 				'action': 'authBySession',
 				'status': 'success',
 				'userId': data.userId
 			});
-			_._link.send({
+			link.send({
 				'action': 'channel_switch',
 				'status': 'default',
-				'channelId': _._link.user.channel.channelId
+				'channelId': link.user.channel.channelId
 			});
 		}
 		_._umount();
