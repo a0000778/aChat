@@ -238,12 +238,6 @@ Normal.prototype.user_removeSession=function(data,link){
 	if(!(data.hasOwnProperty('session') && (data.session=Base.toBuffer(data.session)) && user.fieldCheck.session(data.session)))
 		return;
 	if(Buffer.compare(link.session,data.session))
-		link.send({
-			'action': 'user_removeSession',
-			'session': data.session.toString('hex'),
-			'status': 'now session'
-		});
-	else
 		user.removeSession(data.session,function(){
 			let sess=this._user.findSession(data.session.toString('hex'));
 			if(sess) sess.exit(4105);
@@ -253,6 +247,13 @@ Normal.prototype.user_removeSession=function(data,link){
 				'status': 'removed'
 			});
 		});
+	else
+		link.send({
+			'action': 'user_removeSession',
+			'session': data.session.toString('hex'),
+			'status': 'now session'
+		});
+		
 }
 Normal.prototype._quotaReset=function(_){
 	_._quota_sendMsg=Math.min(_._quota_sendMsg+quota_sendMsg,quota_sendMsg);
