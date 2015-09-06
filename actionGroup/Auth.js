@@ -63,6 +63,8 @@ Auth.prototype.authBySession=function(data,link){
 			_._link.exit(4101);
 		else if(result=='fail')
 			_._link.exit(4102);
+		else if(result=='repeat login')
+			_._link.exit(4103);
 		else{
 			_._link.send({
 				'action': 'authBySession',

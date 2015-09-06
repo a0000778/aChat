@@ -71,10 +71,13 @@ user.authBySession=function(userId,session,link,callback){
 		if(!result || result.userId!==userId)
 			callback('fail');
 		else if(userListById.has(userId)){
-			db.updateSession(session,function(){
-				link._setUser(session,userListById.get(userId));
-				callback('success');
-			});
+			if(userListById.get(userId).findSession(session))
+				callback('repeat login');
+			else
+				db.updateSession(session,function(){
+					link._setUser(session,userListById.get(userId));
+					callback('success');
+				});
 		}else{
 			db.getUserData('userId',userId,function(result){
 				if(result){
