@@ -203,3 +203,5 @@ Admin.prototype._allUserExec=function(actionGroup,action){
 Admin.prototype._umount=function(){
 	Normal.prototype._umount.call(this);
 }
+
+module.exports=Admin;
