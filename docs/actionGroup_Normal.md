@@ -114,6 +114,21 @@
 * `action` (String) user_editProfile
 * `status` (String) auth fail
 
+### user_listSession
+列出使用者所有的 Session
+
+#### 返回結果
+返回以下指令
+
+* `action` (String) user_listSession
+* `sessions` (Array)
+	* `session`	(Object)
+		* `session`		(Hex)
+		* `createTime`	(Date)
+		* `lastClient`	(String)
+		* `lastLogin`	(Date)
+		* `online`		(Boolean)
+
 ### user_logout
 登出
 #### 參數
@@ -121,6 +136,27 @@
 
 #### 返回結果
 以狀態碼 `1000` 斷線處理。
+
+### user_removeSession
+刪除 Session
+
+#### 參數
+* `session` (Hex)  20 Bytes 的刪除目標 session
+
+#### 返回結果
+##### 成功
+返回以下指令
+
+* `action` (String) user_removeSession
+* `session` (Hex) 20 Bytes 的刪除目標 session
+* `status` (String) removed
+
+##### 失敗 - 為當前連線 Session
+返回以下指令
+
+* `action` (String) user_removeSession
+* `session` (Hex) 20 Bytes 的刪除目標 session
+* `status` (String) now session
 
 ## 伺服端主動發送指令列表
 ### channel_exit

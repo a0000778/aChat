@@ -218,8 +218,41 @@ Normal.prototype.user_editProfile=function(data,link){
 		}
 	});
 }
+Normal.prototype.user_listSession=function(data,link){
+	var u=this._user;
+	user.getSession(this._user.userId,function(result){
+		for(let sess of result){
+			sess.online=!!u.findSession(sess.session);
+			sess.session=sess.session.toString('hex');
+		}
+		link.send({
+			'action': 'user_listSession',
+			'sessions': result
+		});
+	});
+}
 Normal.prototype.user_logout=function(data,link){
 	link.exit();
+}
+Normal.prototype.user_removeSession=function(data,link){
+	if(!(data.hasOwnProperty('session') && (data.session=Base.toBuffer(data.session)) && user.fieldCheck.session(data.session)))
+		return;
+	if(Buffer.compare(link.session,data.session))
+		link.send({
+			'action': 'user_removeSession',
+			'session': data.session.toString('hex'),
+			'status': 'now session'
+		});
+	else
+		user.removeSession(data.session,function(){
+			let sess=this._user.findSession(data.session.toString('hex'));
+			if(sess) sess.exit(4105);
+			link.send({
+				'action': 'user_removeSession',
+				'session': data.session.toString('hex'),
+				'status': 'removed'
+			});
+		});
 }
 Normal.prototype._quotaReset=function(_){
 	_._quota_sendMsg=Math.min(_._quota_sendMsg+quota_sendMsg,quota_sendMsg);

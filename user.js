@@ -195,6 +195,21 @@ user.getProfile=function(userId,callback){
 		callback(result);
 	});
 }
+/*
+	- userId	Number
+	- callback	Function
+		- result	(Array)
+			- session	(Object)
+				- session		(Buffer)
+				- createTime	(Date)
+				- lastClient	(String)
+				- lastLogin		(Date)
+*/
+user.getSession=function(userId,callback){
+	if(!fieldCheck.userId(userId))
+		throw new Error('field format error');
+	db.getUserSession(userId,callback);
+}
 user.listSession=function(){
 	let list=[];
 	for(let u of sessionList){
@@ -208,6 +223,15 @@ user.listUser=function(){
 		list.push(u);
 	}
 	return list;
+}
+/*
+	- session	Buffer
+	- callback	Function
+*/
+user.removeSession=function(session,callback){
+	if(!fieldCheck.session(session))
+		throw new Error('field format error');
+	db.removeSession(session,callback);
 }
 /*
 	- userId	Number
@@ -309,7 +333,7 @@ Link.prototype._setUser=function(session,userId,username,actionGroup){
 		this.user=userId;
 	else
 		this.user=new User(userId,username,actionGroup);
-	this.user.sessions.add(this);
+	this.user.sessions.set(session.toString('hex'),this);
 	this.link
 		.removeAllListeners('message')
 		.on('message',function(data){
@@ -323,7 +347,7 @@ function User(userId,username,actionGroupName){
 	this.username=username;
 	this.channel=null;
 	this.actionGroup=new actionGroup[actionGroupName](this);
-	this.sessions=new Set();
+	this.sessions=new Map();
 	
 	userListById.set(this.userId,this);
 	userListByUsername.set(this.username,this);
@@ -336,13 +360,16 @@ User.prototype._offline=function(){
 	userListByUsername.delete(this.username);
 }
 User.prototype.exit=function(code){
-	for(let session of this.sessions)
+	for(let session of this.sessions.values())
 		session.exit(code);
+}
+User.prototype.findSession=function(session){
+	return this.sessions.get(session.toString('hex'));
 }
 User.prototype.send=function(data){
 	if(util.isObject(data))
 		data=JSON.stringify(data);
-	for(let session of this.sessions)
+	for(let session of this.sessions.values())
 		session.send(data);
 }
 

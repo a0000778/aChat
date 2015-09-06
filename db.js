@@ -130,6 +130,26 @@ var db={};
 		});
 	}
 	/*
+		- userId	Number
+		- callback	Function
+			- result	Array
+				- session	Object
+					- session		Buffer
+					- createTime	Date
+					- lastClient	String
+					- lastLogin		Date
+	*/
+	db.getUserSession=function(userId,callback){
+		pool.query(
+			'SELECT `session`,`createTime`,`lastClient`,`lastLogin` FROM `session` WHERE `userId`=?',
+			[userId],
+			function(error,result){
+				if(error) throw error;
+				callback(result);
+			}
+		);
+	}
+	/*
 		- session	Buffer
 		- callback	Function
 			- result	Object or Null
