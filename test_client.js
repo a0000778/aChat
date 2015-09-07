@@ -1,135 +1,192 @@
 /*
 壓力測試腳本
-node test_client [minOnlineUser=200 [maxOnlineUser=1000]]
+node test_client
 */
 'use strict';
-var WSClient=require('websocket').client;
-var Account=require('./test_account.js');
-const startCount=5000;//連線次數
-const connectInterval=70;//連線間隔
-var minOnlineTime=connectInterval*(process.argv[2] || 200);//最短在線時間(由最小在線人數產生)
-var maxOnlineTime=connectInterval*((process.argv[3] || 1000)-(process.argv[2] || 200));//最長在線時間(由最大在線人數產生)
+let WSClient=require('websocket').client;
+let crypto=require('crypto');
 
-var clientList=[];
-var connectStart=0;
-var connectClose=0;
-var connectFail=0;
-var connectSuccess=0;
-var connectGet=0;
-var connectSend=0;
-var autoConnect=setInterval(function(){
-	connect();
-	if(clientList.length<startCount) return;
-	console.log('已發起 %d 次連線，等待自動登出',startCount);
-	clearInterval(autoConnect);
-},connectInterval);
-var monitor=setInterval(function(){
+let initedClient=0;
+let users=[];
+let commandInputSpeedCount=0;
+let commandOutputSpeedCount=0;
+let linkCount=0;
+let linkFailCount=0;
+
+console.log('載入測試帳號 ...');
+for(let acc of require('./test_account.js'))
+	new TestUser(acc.username,acc.password);
+console.log('已載入 %d 個測試帳號',users.length);
+
+console.log('開始測試');
+let autoInitClient=setInterval(function(){
+	if(initedClient<users.length)
+		users[initedClient].init();
+	else{
+		clearInterval(autoInitClient);
+		console.log('所有模擬用戶端皆已啟用');
+	}
+},100);
+setInterval(function(){
 	console.log(
-		'連線: %d, 收到: %d, 送出: %d, 發起: %d, 成功: %d, 失敗: %d, 關閉: %d',
-		clientList.length,
-		connectGet,
-		connectSend,
-		connectStart,
-		connectSuccess,
-		connectFail,
-		connectClose
+		'帳號數: %d, 連線數: %d, 連線失敗: %d, 指令傳送: %d /s, 指令接收: %d /s',
+		initedClient,
+		linkCount,
+		linkFailCount,
+		commandOutputSpeedCount,
+		commandInputSpeedCount
 	);
-	if(clientList.length) return;
-	console.log('已全數離線，關閉監控');
-	clearInterval(monitor);
+	commandInputSpeedCount=0;
+	commandOutputSpeedCount=0;
 },1000);
 
-function closeAll(){
-	clientList.forEach(function(link){
-		link.close();
-	});
-}
-function connect(){
-	var client=new WSClient();
-	var account=Account.shift();
+function TestClient(user){
+	this.user=user;
+	this.link=null;
+	this.session=null;
+	this.pm=null;
+	this.autoChatTimeout=null;
 	
-	if(!account) return;
-	client
+	let _=this;
+	new WSClient()
 		.on('connect',function(link){
-			link.sendUTF(JSON.stringify({
-				'action': 'auth',
-				'username': account.username,
-				'password': account.password
-			}));
-			mountOutput(link,account);
-			clientList.push(link);
-			connectSuccess++;
+			linkCount++;
+			_.link=link
+			link
+				.on('message',(data) => _._parseCommand(data))
+				.on('close',(code) => _._closeStatus(code))
+				//.on('error',(error) => console.log('Link Error: %s',error))
+			;
+			_._startCommand(link);
 		})
 		.on('connectFailed',function(msg){
-			console.log('嘗試發起連線失敗，原因：%s',msg);
-			connectFail++;
+			//console.log('嘗試發起連線失敗，原因：%s',msg);
+			linkFailCount++;
 		})
+		.connect(
+			'ws://localhost:9700/',
+			'chatv1'
+		)
 	;
-	connectStart++;
-	client.connect(
-		'ws://localhost:9700/',
-		'chatv1'
-	);
 }
-function makeFakeChat(link){
-	if(!link.connected) return;
-	connectSend++;
-	link.sendUTF(JSON.stringify({
-		'action': 'chat_normal',
-		'msg': 'test message at time '+new Date().toLocaleTimeString()
-	}));
-	setTimeout(makeFakeChat,Math.floor(Math.random()*9000)+1000,link);
+TestClient.prototype._autoChat=function(_){
+	_=_ || this;
+	if(!_.session) return;
+	if(_.pm){
+		_._send({
+			'action': 'chat_private',
+			'toUserId': _.pm,
+			'msg': 'test message '+Date.now()
+		});
+	}else{
+		_._send({
+			'action': 'chat_normal',
+			'msg': 'test message '+Date.now()
+		});
+	}
+		
+	if(Math.floor(Math.random()*300))//模擬可能換頻道
+		this.autoChatTimeout=setTimeout(_._autoChat,Math.floor(Math.random()*4000)+1500,_);
+	else
+		_._send({'action':'channel_list'});
 }
-function mountOutput(link,account){
-	link
-		.on('message',function(msg){
-			if(msg.type!=='utf8'){
-				console.log('not utf8!?');
-				return;
-			}
-			msg=JSON.parse(msg.utf8Data);
-			switch(msg.action){
-				case 'auth':
-					if(msg.status=='success'){
-						link.sendUTF(JSON.stringify({'action':'channel_list'}));
-					}
-				break;
-				case 'channel_list':
-					link.sendUTF(JSON.stringify({
-						'action':'channel_switch',
-						'channelId': msg.list[Math.floor(Math.random()*msg.list.length)].channelId
-					}));
-				break;
-				case 'channel_switch':
-					if(['success','full'].indexOf(msg.status)!==-1){
-						makeFakeChat(link);
-					}else if(msg.status!='default'){
-						console.log('[Fail] channel_switch: %s',msg.status);
-						link.close();
-					}
-				break;
-				case 'chat_normal':
-					connectGet++;
-					//console.log(msg.msg);
-				break;
-			}
-		})
-		.on('close',function(code,msg){
-			connectClose++;
-			clientList.splice(clientList.indexOf(link),1);
-			Account.push(account);
-			if(code!==1000) console.log('Link Closed [%d] %s',code,msg);
-		})
-		.on('error',function(err){
-			console.log('Link Error: %s',err);
-		})
-	;
-	setTimeout(function(){
-		if(Math.floor(Math.random()*2))
-			link.close();
-		else
-			link.sendUTF(JSON.stringify({
-				'action': 'user_logout'
-			}));
-	},Math.floor(Math.random()*maxOnlineTime)+minOnlineTime);
+TestClient.prototype._closeStatus=function(code){
+	this.user.idleDevCount++;
+	linkCount--;
+	if(code!==1000)
+		console.log('Close by %d',code);
+	if(this.session)
+		this.user.session.push(this.session);
+}
+TestClient.prototype._parseCommand=function(data){
+	commandInputSpeedCount++;
+	data=JSON.parse(data.utf8Data);
+	switch(data.action){
+		case 'question':
+			this._send({
+				'action': 'createSession',
+				'username': this.user.username,
+				'answer': passwordHmac(new Buffer(data.question,'hex'),new Buffer(this.user.password,'hex'))
+			});
+		break;
+		case 'createSession':
+			this.session={
+				'userId': data.userId,
+				'session': data.session
+			};
+			this._send({
+				'action': 'authBySession',
+				'userId': this.session.userId,
+				'session': this.session.session
+			});
+		break;
+		case 'authBySession':
+			this._send({'action':'channel_list'});
+		break;
+		case 'channel_list':
+			this._send({
+				'action':'channel_switch',
+				'channelId': data.list[Math.floor(Math.random()*data.list.length)].channelId
+			});
+		break;
+		case 'channel_switch':
+			if(data.status=='default' || data.status=='force') return;
+			if(this.autoChatTimeout) clearTimeout(this.autoChatTimeout);
+			this._autoChat();
+		break;
+		case 'chat_normal':
+			if(!(this.pm || Math.floor(Math.random()*50)))
+				this.pm=data.fromUserId;
+		break;
+		case 'chat_private':
+			if(Math.floor(Math.random()*2))
+				this.pm=data.fromUserId;
+			else
+				this.pm=null;
+			if(!Math.floor(Math.random()*2000))
+				this._send({'action': 'logout'});
+			else if(!Math.floor(Math.random()*200))
+				this.link.close();
+		break;
+	}
+}
+TestClient.prototype._send=function(data){
+	commandOutputSpeedCount++;
+	this.link.sendUTF(JSON.stringify(data));
+}
+TestClient.prototype._startCommand=function(){
+	if(!this.user.session.length || Math.floor(Math.random()*5)===0){//假定 25% 的建立 Session 機率
+		this._send({'action': 'createQuestion'});
+	}else{
+		this.session=this.user.session.shift();
+		this._send({
+			'action': 'authBySession',
+			'userId': this.session.userId,
+			'session': this.session.session
+		});
+	}
+}
+
+function TestUser(username,password){
+	this.username=username;
+	this.password=password;
+	this.session=[];
+	this.idleDevCount=Math.floor(Math.random()*4)+1;
+	
+	users.push(this);
+}
+TestUser.prototype.init=function(){
+	initedClient++;
+	setInterval(this.trySpawnClient,5000,this);
+}
+TestUser.prototype.trySpawnClient=function(_){
+	_=_ || this;
+	if(_.idleDevCount){
+		_.idleDevCount--;
+		new TestClient(_);
+	}
+}
+
+function passwordHmac(question,password){
+	return crypto.createHmac('sha256',password).update(question).digest('hex');
 }
