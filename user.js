@@ -158,7 +158,7 @@ user.exit=function(code){
 user.send=function(data){
 	if(util.isObject(data))
 		data=JSON.stringify(data);
-	for(let u of userList.values())
+	for(let u of userListById.values())
 		u.send(data);
 }
 /*
