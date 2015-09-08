@@ -118,7 +118,7 @@ Admin.prototype.user_ban=function(data,link){
 		});
 	}
 }
-Admin.prototype.user_unban=function(data){
+Admin.prototype.user_unban=function(data,link){
 	if(user.fieldCheck.userId(data.userId)){
 		user.findUser('userId',data.userId,function(result){
 			if(result){
@@ -137,7 +137,7 @@ Admin.prototype.user_unban=function(data){
 		});
 	}
 }
-Admin.prototype.chat_global=function(data){
+Admin.prototype.chat_global=function(data,link){
 	if(!(data.hasOwnProperty('msg') && data.msg.length)) return;
 	if(user.fieldCheck.userId(data.userId)){
 		let u=user.findUser('userId',data.userId);
