@@ -3,6 +3,7 @@ var util=require('util');
 var channel=require('../channel.js');
 var config=require('../config.js');
 var db=require('../db.js');
+var Base=require('./Base.js');
 var Normal=require('./Normal.js');
 var user=require('../user.js');
 
