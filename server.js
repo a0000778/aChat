@@ -41,11 +41,7 @@ wsServer.on('request',function(req){
 });
 
 console.log('載入頻道列表...');
-channel.loadAll(function(error){
-	if(error){
-		console.log('頻道列表載入失敗');
-		process.exit();
-	}
+channel.loadAll(function(){
 	if(!channel.findById(config.channelDefault)){
 		console.log('預設頻道不存在！');
 		process.exit();
@@ -59,33 +55,25 @@ channel.loadAll(function(error){
 		}else{
 			process.on('uncaughtException',function(e){
 				console.error(e.stack);
-				serverLock=true;
-				user.exit(4003);
-				httpServer.close();
-				db.writeChatLogNow(true);
-				setInterval(function(){
-					let chatLogCacheCount=db.chatLogCacheCount();
-					let queryQueueCount=db.queryQueueCount;
-					if(!(chatLogCacheCount || queryQueueCount))
-						process.exit();
-					console.log('等待資料庫操作完畢 (操作: %d, 記錄快取: %d) ...',queryQueueCount,chatLogCacheCount);
-				},1000);
+				shutdown();
 			});
+			process.once('SIGINT',shutdown);
 			console.log('啟動完畢');
-			process.once('SIGINT',function(){
-				process.on('SIGINT',() => console.log('伺服器關閉中 ...'));
-				serverLock=true;
-				user.exit(1001);
-				httpServer.close();
-				db.writeChatLogNow(true);
-				setInterval(function(){
-					let chatLogCacheCount=db.chatLogCacheCount();
-					let queryQueueCount=db.queryQueueCount;
-					if(!(chatLogCacheCount || queryQueueCount))
-						process.exit();
-					console.log('等待資料庫操作完畢 (操作: %d, 記錄快取: %d) ...',queryQueueCount,chatLogCacheCount);
-				},1000);
-			});
 		}
 	});
 });
+
+function shutdown(){
+	process.on('SIGINT',() => console.log('伺服器關閉中 ...'));
+	serverLock=true;
+	user.exit(1001);
+	httpServer.close();
+	db.writeChatLogNow(true);
+	setInterval(function(){
+		let chatLogCacheCount=db.chatLogCacheCount();
+		let queryQueueCount=db.queryQueueCount;
+		if(!(chatLogCacheCount || queryQueueCount))
+			process.exit();
+		console.log('等待資料庫操作完畢 (操作: %d, 記錄快取: %d) ...',queryQueueCount,chatLogCacheCount);
+	},1000);
+}
