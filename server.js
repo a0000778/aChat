@@ -65,9 +65,10 @@ channel.loadAll(function(error){
 				db.writeChatLogNow(true);
 				setInterval(function(){
 					let chatLogCacheCount=db.chatLogCacheCount();
-					if(!chatLogCacheCount)
+					let queryQueueCount=db.queryQueueCount;
+					if(!(chatLogCacheCount || queryQueueCount))
 						process.exit();
-					console.log('等待聊天記錄完全寫出 (剩餘 %d) ...',chatLogCacheCount);
+					console.log('等待資料庫操作完畢 (操作: %d, 記錄快取: %d) ...',queryQueueCount,chatLogCacheCount);
 				},1000);
 			});
 			console.log('啟動完畢');
@@ -79,9 +80,10 @@ channel.loadAll(function(error){
 				db.writeChatLogNow(true);
 				setInterval(function(){
 					let chatLogCacheCount=db.chatLogCacheCount();
-					if(!chatLogCacheCount)
+					let queryQueueCount=db.queryQueueCount;
+					if(!(chatLogCacheCount || queryQueueCount))
 						process.exit();
-					console.log('等待聊天記錄完全寫出 (剩餘 %d) ...',chatLogCacheCount);
+					console.log('等待資料庫操作完畢 (操作: %d, 記錄快取: %d) ...',queryQueueCount,chatLogCacheCount);
 				},1000);
 			});
 		}

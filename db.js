@@ -6,6 +6,10 @@ var config=require('./config.js');
 var pool=mysql.createPool(config.mysql);
 var db={};
 
+Object.defineProperty(db,'queryQueueCount',{
+	'get': () => pool._allConnections.length-pool._freeConnections.length+pool._connectionQueue.length
+});
+
 /* Channel */
 (function(db){
 	/*
