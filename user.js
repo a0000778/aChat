@@ -296,6 +296,7 @@ function Link(link){
 	this.user=null;
 	this.session=null;
 	this.link=link;
+	this.removeSession=false;
 	this._question=null;
 	var auth=new actionGroup.Auth(this);
 	
@@ -320,7 +321,10 @@ Link.prototype.exit=function(code){
 	}
 	sessionList.delete(this);
 	if(this.session){
-		db.updateSession(this.session);
+		if(this.removeSession)
+			db.removeSession(this.session);
+		else
+			db.updateSession(this.session);
 	}
 }
 Link.prototype.send=function(data){

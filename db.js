@@ -167,7 +167,7 @@ var db={};
 	db.removeSession=function(session,callback){
 		pool.query('DELETE FROM `session` WHERE `session`=?;',[session],function(error,result){
 			if(error) throw error;
-			callback();
+			callback && callback();
 		});
 	}
 	/*

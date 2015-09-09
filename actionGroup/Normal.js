@@ -232,6 +232,7 @@ Normal.prototype.user_listSession=function(data,link){
 	});
 }
 Normal.prototype.user_logout=function(data,link){
+	link.removeSession=true;
 	link.exit();
 }
 Normal.prototype.user_removeSession=function(data,link){
