@@ -9,14 +9,14 @@ var util=require('util');
 const fieldCheck={
 	//資料庫欄位
 	'userId': (userId) => Number.isSafeInteger(userId) && userId>0,
-	'username': (username) => util.isString(username) && /^[^\x00-\x1f\x7f]{1,20}$/.test(username),
-	'email': (email) => util.isString(email) && /^[a-z0-9]+(?:(?:\+|\.)[a-z0-9]+)*@(?:[a-z0-9][a-z0-9-]*[a-z0-9])+(?:\.[a-z]{2,5}){1,2}$/i.test(email),
-	'password': (password) => util.isBuffer(password) && password.length===32,
-	'active': (active) => util.isBoolean(active),
-	'actionGroup': (name) => util.isString(name) && actionGroup.hasOwnProperty(name),
-	'session': (session) => util.isBuffer(session) && session.length===20,
+	'username': (username) => typeof(username)==='string' && /^[^\x00-\x1f\x7f]{1,20}$/.test(username),
+	'email': (email) => typeof(email)==='string' && /^[a-z0-9]+(?:(?:\+|\.)[a-z0-9]+)*@(?:[a-z0-9][a-z0-9-]*[a-z0-9])+(?:\.[a-z]{2,5}){1,2}$/i.test(email),
+	'password': (password) => Buffer.isBuffer(password) && password.length===32,
+	'active': (active) => typeof(active)==='boolean',
+	'actionGroup': (name) => typeof(name)==='string' && actionGroup.hasOwnProperty(name),
+	'session': (session) => Buffer.isBuffer(session) && session.length===20,
 	//臨時資料
-	'question': (question) => util.isBuffer(question) && question.length>7,
+	'question': (question) => Buffer.isBuffer(question) && question.length>7,
 	'answer': (answer) => Buffer.isBuffer(answer) && answer.length===32
 };
 var user={};
@@ -156,7 +156,7 @@ user.exit=function(code){
 	- data		Mixed
 */
 user.send=function(data){
-	if(util.isObject(data))
+	if(typeof(data)!=='string')
 		data=JSON.stringify(data);
 	for(let u of userListById.values())
 		u.send(data);
@@ -332,7 +332,7 @@ Link.prototype.send=function(data){
 	if(Buffer.isBuffer(data))
 		this.link.sendBytes(data);
 	else
-		this.link.sendUTF(util.isString(data)? data:JSON.stringify(data));
+		this.link.sendUTF(typeof(data)==='string'? data:JSON.stringify(data));
 	return true;
 }
 Link.prototype._setUser=function(session,userId,username,actionGroup){
@@ -377,7 +377,7 @@ User.prototype.findSession=function(session){
 	return this.sessions.get(session.toString('hex'));
 }
 User.prototype.send=function(data){
-	if(util.isObject(data))
+	if(typeof(data)!=='string')
 		data=JSON.stringify(data);
 	for(let session of this.sessions.values())
 		session.send(data);

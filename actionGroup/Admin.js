@@ -192,7 +192,7 @@ Admin.prototype._allUserExec=function(actionGroup,action){
 				u.actionGroup._execObject.apply(u.actionGroup,args);
 			}
 		}
-	}else if(util.isString(actionGroup)){
+	}else if(typeof(actionGroup)==='string'){
 		for(let u of user.listUser()){
 			if(u.actionGroup.constructor.name===actionGroup){
 				let args=[u].concat(Array.prototype.slice.call(arguments,1));

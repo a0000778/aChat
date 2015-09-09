@@ -75,7 +75,7 @@ Normal.prototype.channel_userList=function(data,link,channelId,list){
 	});
 }
 Normal.prototype.chat_normal=function(data,link){
-	if(!(util.isString(data.msg) && data.msg.length)) return;
+	if(!(typeof(data.msg)==='string' && data.msg.length)) return;
 	if(!this._user.channel) return;
 	let time=new Date();
 	if(this._quota_sendMsg<=0){
@@ -99,7 +99,7 @@ Normal.prototype.chat_normal=function(data,link){
 Normal.prototype.chat_private=function(data,link){
 	if(!(
 		Number.isSafeInteger(data.toUserId) && data.toUserId>0 && 
-		util.isString(data.msg) && data.msg.length
+		typeof(data.msg)==='string' && data.msg.length
 	)) return;
 	var target=user.findUser('userId',data.toUserId);
 	if(target){

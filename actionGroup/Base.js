@@ -7,7 +7,7 @@ function Base(user){
 	this._user=user;
 }
 Base.toBuffer=function(hex){
-	return util.isString(hex) && /^[0-9a-f]+$/i.test(hex) && new Buffer(hex,'hex');
+	return typeof(hex)==='string' && /^[0-9a-f]+$/i.test(hex) && new Buffer(hex,'hex');
 }
 Base.makeChannelList=function(){
 	let chList=[];

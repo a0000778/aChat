@@ -255,7 +255,7 @@ function allowPost(req,res){
 	res.end();
 }
 function toBuffer(hex){
-	return util.isString(hex) && /^[0-9a-f]+$/i.test(hex) && new Buffer(hex,'hex');
+	return typeof(hex)==='string' && /^[0-9a-f]+$/i.test(hex) && new Buffer(hex,'hex');
 }
 
 module.exports={
