@@ -187,7 +187,7 @@ var db={};
 		}
 		pool.query(sql,args,function(error,result){
 			if(error) throw error;
-			callback();
+			callback && callback();
 		});
 	}
 	/*

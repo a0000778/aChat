@@ -319,6 +319,9 @@ Link.prototype.exit=function(code){
 		this.user._offline();
 	}
 	sessionList.delete(this);
+	if(this.session){
+		db.updateSession(this.session);
+	}
 }
 Link.prototype.send=function(data){
 	if(!this.link.connected) return false;
