@@ -11,49 +11,49 @@ function Admin(user){
 	Normal.call(this,user);
 }
 util.inherits(Admin,Normal);
-Admin.prototype.channel_create=function(data,link){
+Admin.prototype.admin_channel_create=function(data,link){
 	if(data.hasOwnProperty('name') && data.name.length>0){
 		var _=this;
 		channel.create(data.name,function(){
 			link.send({
-				'action': 'channel_create',
+				'action': 'admin_channel_create',
 				'status': 'success'
 			});
 			_._allUserExec('Normal',{'action':'channel_list'},Base.makeChannelList());
 		});
 	}
 }
-Admin.prototype.channel_edit=function(data,link){
+Admin.prototype.admin_channel_edit=function(data,link){
 	if(Number.isSafeInteger(data.channelId) && data.channelId>0){
 		var ch=channel.findById(data.channelId);
 		if(ch && ch.name!==data.name){
 			var _=this;
 			ch.update(data.name,function(error){
 				_._user.send({
-					'action': 'channel_edit',
+					'action': 'admin_channel_edit',
 					'status': 'success'
 				});
 				_._allUserExec('Normal',{'action':'channel_list'},Base.makeChannelList());
 			});
 		}else{
 			link.send({
-				'action': 'channel_edit',
+				'action': 'admin_channel_edit',
 				'status': 'not exists'
 			});
 		}
 	}
 }
-Admin.prototype.channel_delete=function(data,link){
+Admin.prototype.admin_channel_delete=function(data,link){
 	if(Number.isSafeInteger(data.channelId) && data.channelId>0){
 		let ch,chDefault;
 		if(data.channelId==config.channelDefault){
 			this.send({
-				'action': 'channel_delete',
+				'action': 'admin_channel_delete',
 				'status': 'default channel'
 			});
 		}else if(!(chDefault=channel.findById(config.channelDefault))){
 			link.send({
-				'action': 'channel_delete',
+				'action': 'admin_channel_delete',
 				'status': 'default channel not exists'
 			});
 		}else if(ch=channel.findById(data.channelId)){
@@ -68,76 +68,76 @@ Admin.prototype.channel_delete=function(data,link){
 				chDefault.join(u);
 			ch.delete(function(){
 				link.send({
-					'action': 'channel_delete',
+					'action': 'admin_channel_delete',
 					'status': 'success'
 				});
 				_._allUserExec('Normal',{'action':'channel_list'},Base.makeChannelList());
 			});
 		}else{
 			link.send({
-				'action': 'channel_delete',
+				'action': 'admin_channel_delete',
 				'status': 'not exists'
 			});
 		}
 	}
 }
-Admin.prototype.user_kick=function(data,link){
+Admin.prototype.admin_user_kick=function(data,link){
 	if(user.fieldCheck.userId(data.userId)){
 		let u=user.findById(data.userId);
 		if(user){
 			user.exit(4104);
 			link.send({
-				'action': 'user_kick',
+				'action': 'admin_user_kick',
 				'status': 'success'
 			});
 		}else{
 			link.send({
-				'action': 'user_kick',
+				'action': 'admin_user_kick',
 				'status': 'not exists'
 			});
 		}
 	}
 }
-Admin.prototype.user_ban=function(data,link){
+Admin.prototype.admin_user_ban=function(data,link){
 	if(user.fieldCheck.userId(data.userId)){
 		var u=user.findUser('userId',data.userId,function(result){
 			if(result){
 				if(u) u.exit(4104);
 				user.updateProfile(data.userId,{'active': false},function(){
 					link.send({
-						'action': 'user_ban',
+						'action': 'admin_user_ban',
 						'status': 'success'
 					});
 				});
 			}else{
 				link.send({
-					'action': 'user_ban',
+					'action': 'admin_user_ban',
 					'status': 'not exists'
 				});
 			}
 		});
 	}
 }
-Admin.prototype.user_unban=function(data,link){
+Admin.prototype.admin_user_unban=function(data,link){
 	if(user.fieldCheck.userId(data.userId)){
 		user.findUser('userId',data.userId,function(result){
 			if(result){
 				user.updateProfile(data.userId,{'active': true},function(){
 					link.send({
-						'action': 'user_unban',
+						'action': 'admin_user_unban',
 						'status': 'success'
 					});
 				});
 			}else{
 				link.send({
-					'action': 'user_unban',
+					'action': 'admin_user_unban',
 					'status': 'not exists'
 				});
 			}
 		});
 	}
 }
-Admin.prototype.chat_global=function(data,link){
+Admin.prototype.admin_chat_global=function(data,link){
 	if(!(data.hasOwnProperty('msg') && data.msg.length)) return;
 	if(user.fieldCheck.userId(data.userId)){
 		let u=user.findUser('userId',data.userId);
@@ -148,12 +148,12 @@ Admin.prototype.chat_global=function(data,link){
 				'msg': data.msg
 			});
 			link.send({
-				'action': 'chat_global',
+				'action': 'admin_chat_global',
 				'status': 'success'
 			});
 		}else{
 			link.send({
-				'action': 'chat_global',
+				'action': 'admin_chat_global',
 				'status': 'fail'
 			});
 		}
@@ -166,12 +166,12 @@ Admin.prototype.chat_global=function(data,link){
 				'msg': data.msg
 			});
 			link.send({
-				'action': 'chat_global',
+				'action': 'admin_chat_global',
 				'status': 'success'
 			});
 		}else{
 			link.send({
-				'action': 'chat_global',
+				'action': 'admin_chat_global',
 				'status': 'fail'
 			});
 		}
@@ -182,7 +182,7 @@ Admin.prototype.chat_global=function(data,link){
 			'msg': data.msg
 		});
 		link.send({
-			'action': 'chat_global',
+			'action': 'admin_chat_global',
 			'status': 'success'
 		});
 	}
