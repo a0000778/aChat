@@ -175,19 +175,30 @@ Object.defineProperty(db,'queryQueueCount',{
 		});
 	}
 	/*
-		- session	Buffer
-		- messageId	Number	(option)
-		- callback	Function
+		- session		Buffer
+		- updateData	Object	(option)
+			- messageId		Number	(option)
+			- lastClient	String	(option)
+		- callback		Function
 	*/
-	db.updateSession=function(session,messageId,callback){
+	db.updateSession=function(session,updateData,callback){
 		let sql,args;
 		if(!callback){
 			callback=messageId;
 			sql='UPDATE `session` SET `lastLogin`=? WHERE `session`=?;';
 			args=[new Date(),session];
 		}else{
-			sql='UPDATE `session` SET `messageId`=?,`lastLogin`=? WHERE `session`=?;';
-			args=[messageId,new Date(),session];
+			sql='UPDATE `session` SET ';
+			args=[];
+			for(let field in updateData){
+				if(field==='messageId' || field==='lastClient'){
+					sql+='??=?,';
+					args.push(field,updateData[field]);
+				}else
+					throw new Error('not allow field');
+			}
+			sql+='`lastLogin`=? WHERE `session`=?;';
+			args.push(new Date(),session);
 		}
 		pool.query(sql,args,function(error,result){
 			if(error) throw error;
