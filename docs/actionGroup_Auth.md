@@ -37,6 +37,7 @@
 * `action` (String) authBySession
 * `status` (String) success
 * `userId` (Number) 帳號ID
+* `actionGroup` (String) 當前指令集名稱
 
 ##### 驗證失敗 - 帳號停用中
 以狀態碼 `4101` 斷線處理。

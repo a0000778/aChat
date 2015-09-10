@@ -68,7 +68,8 @@ Auth.prototype.authBySession=function(data,link){
 			link.send({
 				'action': 'authBySession',
 				'status': 'success',
-				'userId': data.userId
+				'userId': data.userId,
+				'actionGroup': link.user.actionGroup.constructor.name
 			});
 			link.send({
 				'action': 'channel_switch',
