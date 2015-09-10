@@ -144,6 +144,7 @@ Admin.prototype.chat_global=function(data,link){
 		if(u){
 			user.send({
 				'action': 'chat_global',
+				'time': Date.now(),
 				'msg': data.msg
 			});
 			link.send({
@@ -161,6 +162,7 @@ Admin.prototype.chat_global=function(data,link){
 		if(channel){
 			channel.send({
 				'action': 'chat_global',
+				'time': Date.now(),
 				'msg': data.msg
 			});
 			link.send({
@@ -176,6 +178,7 @@ Admin.prototype.chat_global=function(data,link){
 	}else{
 		user.send({
 			'action': 'chat_global',
+			'time': Date.now(),
 			'msg': data.msg
 		});
 		link.send({
