@@ -231,7 +231,7 @@ Object.defineProperty(db,'queryQueueCount',{
 (function(db){
 	var chatLogCache=[];
 	var writingCount=0;
-	var writeTTL=setTimeout(db.writeChatLogNow,config.chatLogCacheTTL);
+	var writeTTL=setTimeout(db.writeChatLogNow,config.chatLogCacheTTL,true);
 	
 	db.writeChatLog=function(time,type,channelId,fromUserId,toUserId,msg){
 		var at=0;
