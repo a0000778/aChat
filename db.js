@@ -184,7 +184,7 @@ Object.defineProperty(db,'queryQueueCount',{
 	db.updateSession=function(session,updateData,callback){
 		let sql,args;
 		if(!callback){
-			callback=messageId;
+			callback=updateData;
 			sql='UPDATE `session` SET `lastLogin`=? WHERE `session`=?;';
 			args=[new Date(),session];
 		}else{
