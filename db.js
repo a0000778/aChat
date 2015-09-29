@@ -1,17 +1,17 @@
 'use strict';
-var crypto=require('crypto');
-var mysql=require('mysql');
-var config=require('./config.js');
+let crypto=require('crypto');
+let mysql=require('mysql');
+let config=require('./config.js');
 
-var pool=mysql.createPool(config.mysql);
-var db={};
+let pool=mysql.createPool(config.mysql);
+let db={};
 
 Object.defineProperty(db,'queryQueueCount',{
 	'get': () => pool._allConnections.length-pool._freeConnections.length+pool._connectionQueue.length
 });
 
 /* Channel */
-(function(db){
+{
 	/*
 		- callback	Function
 			- result	Array
@@ -59,10 +59,10 @@ Object.defineProperty(db,'queryQueueCount',{
 			callback();
 		});
 	}
-})(db);
+};
 
 /* User */
-(function(db){
+{
 	/*
 		- username	String
 		- email		String
@@ -106,7 +106,7 @@ Object.defineProperty(db,'queryQueueCount',{
 			- session	Buffer
 	*/
 	db.createSession=function(userId,callback){
-		var session=crypto.randomBytes(20);
+		let session=crypto.randomBytes(20);
 		pool.query(
 			'INSERT INTO `session` (`session`,`userId`,`createTime`) VALUES (?);',
 			[[session,userId,new Date()]],
@@ -225,16 +225,16 @@ Object.defineProperty(db,'queryQueueCount',{
 				callback();
 		});
 	}
-})(db);
+};
 
 /* Chat Log */
-(function(db){
-	var chatLogCache=[];
-	var writingCount=0;
-	var writeTTL=setTimeout(db.writeChatLogNow,config.chatLogCacheTTL,true);
+{
+	let chatLogCache=[];
+	let writingCount=0;
+	let writeTTL=setTimeout(writeChatLog,config.chatLogCacheTTL,true);;
 	
 	db.writeChatLog=function(time,type,channelId,fromUserId,toUserId,msg){
-		var at=0;
+		let at=0;
 		while(at<msg.length){
 			chatLogCache.push([time,type,channelId,fromUserId,toUserId,msg.substr(at,255)]);
 			at+=255;
@@ -244,28 +244,31 @@ Object.defineProperty(db,'queryQueueCount',{
 	db.writeChatLogNow=function(force){
 		if(chatLogCache.length<config.chatLogCacheCount && !force) return;
 		clearTimeout(writeTTL);
-		writeTTL=setTimeout(db.writeChatLogNow,config.chatLogCacheTTL);
-		var waitWrite=chatLogCache.splice(0,config.chatLogCacheCount);
-		if(!waitWrite.length) return;
-		writingCount+=waitWrite.length;
-		pool.query(
-			'INSERT INTO `chatlog` (`time`,`type`,`channelId`,`fromUserId`,`toUserId`,`message`) VALUES ?;',
-			[waitWrite],
-			function(error,result){
-				writingCount-=waitWrite.length;
-				if(error){
-					console.error('無法寫入聊天記錄，錯誤: %j',error);
-					chatLogCache.unshift.apply(chatLogCache,waitWrite);
-					waitWrite=[];
-				}
-			}
-		);
-		if(force && chatLogCache.length)
-			db.writeChatLogNow(force);
+		writeTTL=setTimeout(writeChatLog,config.chatLogCacheTTL);
+		writeChatLog(force);
 	}
 	db.chatLogCacheCount=function(){
 		return chatLogCache.length+writingCount;
 	}
-})(db);
+	function writeChatLog(force){
+		do{
+			if(!chatLogCache.length) return;
+			let waitWrite=chatLogCache.splice(0,config.chatLogCacheCount);
+			writingCount+=waitWrite.length;
+			pool.query(
+				'INSERT INTO `chatlog` (`time`,`type`,`channelId`,`fromUserId`,`toUserId`,`message`) VALUES ?;',
+				[waitWrite],
+				function(error,result){
+					writingCount-=waitWrite.length;
+					if(error){
+						console.error('無法寫入聊天記錄，錯誤: %j',error);
+						chatLogCache.unshift.apply(chatLogCache,waitWrite);
+						waitWrite=[];
+					}
+				}
+			);
+		}while(force && chatLogCache.length)
+	}
+}
 
 module.exports=db;
