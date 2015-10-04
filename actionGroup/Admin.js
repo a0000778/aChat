@@ -139,14 +139,16 @@ Admin.prototype.admin_user_unban=function(data,link){
 }
 Admin.prototype.admin_chat_global=function(data,link){
 	if(!(data.hasOwnProperty('msg') && data.msg.length)) return;
+	let time=new Date();
 	if(user.fieldCheck.userId(data.userId)){
 		let u=user.findUser('userId',data.userId);
 		if(u){
 			u.send({
 				'action': 'chat_global',
-				'time': Date.now(),
+				'time': time.getTime(),
 				'msg': data.msg
 			});
+			db.writeChatLog(time,3,null,this._user.userId,data.userId,data.msg);
 			link.send({
 				'action': 'admin_chat_global',
 				'status': 'success'
@@ -162,9 +164,10 @@ Admin.prototype.admin_chat_global=function(data,link){
 		if(ch){
 			ch.send({
 				'action': 'chat_global',
-				'time': Date.now(),
+				'time': time.getTime(),
 				'msg': data.msg
 			});
+			db.writeChatLog(time,3,data.channelId,this._user.userId,null,data.msg);
 			link.send({
 				'action': 'admin_chat_global',
 				'status': 'success'
@@ -178,9 +181,10 @@ Admin.prototype.admin_chat_global=function(data,link){
 	}else{
 		user.send({
 			'action': 'chat_global',
-			'time': Date.now(),
+			'time': time.getTime(),
 			'msg': data.msg
 		});
+		db.writeChatLog(time,3,null,this._user.userId,null,data.msg);
 		link.send({
 			'action': 'admin_chat_global',
 			'status': 'success'
