@@ -244,9 +244,9 @@ Object.defineProperty(db,'queryQueueCount',{
 		filter.startMessageId!==undefined && where.push('`messageId`>=?') && args.push(filter.startMessageId);
 		filter.startTime!==undefined && where.push('`time`>?') && args.push(filter.startTime);
 		filter.endTime!==undefined && where.push('`time`<?') && args.push(filter.endTime);
-		filter.userId>0 && where.push('(`fromUserId`=? OR `toUserId`=?)') && args.push(filter.userId,where.userId);
-		filter.channelId>0 && where.push('`channelId`=?') && args.push(filter.channelId);
-		filter.type!==undefined && where.push('`type`=?') && args.push(filter.type);
+		filter.userId>0 && where.push('(`fromUserId`'+sql_isOrIn(filter.userId)+' OR `toUserId`='+sql_isOrIn(filter.userId)+')') && args.push(filter.userId,where.userId);
+		filter.channelId>0 && where.push('`channelId`='+sql_isOrIn(filter.userId)) && args.push(filter.channelId);
+		filter.type!==undefined && where.push('`type`='+sql_isOrIn(filter.userId)) && args.push(filter.type);
 		filter.limit>0 && (limit=' LIMIT ?') && args.push(filter.limit);
 		pool.query(
 			'SELECT * FROM `chatlog`'+(where.length? ' WHERE '+where.join(' AND '):'')+limit+';',
@@ -292,6 +292,10 @@ Object.defineProperty(db,'queryQueueCount',{
 			);
 		}while(force && chatLogCache.length)
 	}
+}
+
+function sql_isOrIn(value){
+	return Array.isArray(value)? ' IN (?)':'=?';
 }
 
 module.exports=db;
