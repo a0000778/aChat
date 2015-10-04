@@ -233,6 +233,29 @@ Object.defineProperty(db,'queryQueueCount',{
 	let writingCount=0;
 	let writeTTL=setTimeout(writeChatLog,60000,true);
 	
+	db.getChatLog=function(filter,each,callback){
+		const fields=['startMessageId','startTime','endTime','userId','channelId','type','limit'];
+		filter=filter || {};
+		let where=[];
+		let limit='';
+		let args=[];
+		if(!Object.keys(filter).every((key) => fields.indexOf(key)!==-1))
+			throw new Error('filter have not allow field');
+		filter.startMessageId!==undefined && where.push('`messageId`>=?') && args.push(filter.startMessageId);
+		filter.startTime!==undefined && where.push('`time`>?') && args.push(filter.startTime);
+		filter.endTime!==undefined && where.push('`time`<?') && args.push(filter.endTime);
+		filter.userId>0 && where.push('(`fromUserId`=? OR `toUserId`=?)') && args.push(filter.userId,where.userId);
+		filter.channelId>0 && where.push('`channelId`=?') && args.push(filter.channelId);
+		filter.type!==undefined && where.push('`type`=?') && args.push(filter.type);
+		filter.limit>0 && (limit=' LIMIT ?') && args.push(filter.limit);
+		pool.query(
+			'SELECT * FROM `chatlog`'+(where.length? ' WHERE '+where.join(' AND '):'')+limit+';',
+			args
+		)
+			.on('result',each)
+			.on('end',callback)
+		;
+	}
 	db.writeChatLog=function(time,type,channelId,fromUserId,toUserId,msg){
 		let at=0;
 		while(at<msg.length){
