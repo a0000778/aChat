@@ -142,7 +142,7 @@ Admin.prototype.admin_chat_global=function(data,link){
 	if(user.fieldCheck.userId(data.userId)){
 		let u=user.findUser('userId',data.userId);
 		if(u){
-			user.send({
+			u.send({
 				'action': 'chat_global',
 				'time': Date.now(),
 				'msg': data.msg
@@ -159,8 +159,8 @@ Admin.prototype.admin_chat_global=function(data,link){
 		}
 	}else if(Number.isSafeInteger(data.channelId) && data.channelId>0){
 		let ch=channel.findById(data.channelId);
-		if(channel){
-			channel.send({
+		if(ch){
+			ch.send({
 				'action': 'chat_global',
 				'time': Date.now(),
 				'msg': data.msg
