@@ -75,7 +75,7 @@ user.authBySession=function(userId,session,link,callback){
 				callback('repeat login');
 			else
 				db.updateSession(session,function(){
-					link._setUser(session,userListById.get(userId));
+					link._setUser(session,userId);
 					callback('success');
 				});
 		}else{
@@ -339,10 +339,7 @@ Link.prototype._setUser=function(session,userId,username,actionGroup){
 	if(this.user) return;
 	var _=this;
 	this.session=session;
-	if(userId instanceof User)
-		this.user=userId;
-	else
-		this.user=new User(userId,username,actionGroup);
+	this.user=userListById.get(userId) || new User(userId,username,actionGroup);
 	this.user.sessions.set(session.toString('hex'),this);
 	this.link
 		.removeAllListeners('message')
