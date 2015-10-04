@@ -231,7 +231,7 @@ Object.defineProperty(db,'queryQueueCount',{
 {
 	let chatLogCache=[];
 	let writingCount=0;
-	let writeTTL=setTimeout(writeChatLog,config.chatLogCacheTTL,true);;
+	let writeTTL=setTimeout(writeChatLog,60000,true);
 	
 	db.writeChatLog=function(time,type,channelId,fromUserId,toUserId,msg){
 		let at=0;
@@ -244,7 +244,7 @@ Object.defineProperty(db,'queryQueueCount',{
 	db.writeChatLogNow=function(force){
 		if(chatLogCache.length<config.chatLogCacheCount && !force) return;
 		clearTimeout(writeTTL);
-		writeTTL=setTimeout(writeChatLog,config.chatLogCacheTTL);
+		writeTTL=setTimeout(writeChatLog,60000);
 		writeChatLog(force);
 	}
 	db.chatLogCacheCount=function(){

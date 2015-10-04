@@ -14,8 +14,7 @@ module.exports={
 	'channelDefault': 1,			//預設頻道ID
 	'channelUserMax': 200,			//單一頻道人數上限
 	
-	'chatLogCacheCount': 500,		//每多少筆記錄寫入一次
-	'chatLogCacheTTL': 600*1000,	//無觸發 chatLogCacheCount 的情況下，多久寫入一次記錄(毫秒)
+	'chatLogCacheCount': 500,		//聊天記錄寫入快取筆數上限
 	
 	'mailTimeout': 3600*1000,		//發信確認類有效時間(秒)
 	'mailSender': 'me@chat',		//確認信發信者E-mail
