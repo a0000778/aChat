@@ -68,6 +68,35 @@
 * `error` (String) offline or not exists
 * `toUserId` (Number) 目標使用者ID
 
+### chatlog_query
+查詢聊天記錄，不包含快取中的記錄
+#### 欄位
+* `type` (String) 查詢類型
+	* `public` 公開訊息，包含公告、公開聊天訊息
+	* `private` 私人訊息，包含密頻、管理員密頻
+* `channelId` (Number,選擇性) 查詢頻道，查詢類型為 `public` 時有效
+* `startTime` (Number,選擇性) 查詢在此之後發送的訊息，Unix Time (ms)
+* `endTime` (Number,選擇性) 查詢在此之前發送的訊息，Unix Time (ms)
+* `startMessageId` (Number,選擇性) 查詢在此編號之後的訊息
+* `limit` (Number,選擇性) 查詢結果數量限制，預設 100，最大 500
+
+#### 返回結果
+返回以下指令
+
+* `action` (String) chatlog_query
+* `result` (Array) 查詢結果
+	* (Object)
+		* `messageId` (Number) 記錄編號
+		* `time` (Number) 發言時間，Unix Time (ms)
+		* `fromUserId` (Number) 發言者 userId
+		* `toUserId` (Number or Null) 目標 userId，非密頻則為 Null
+		* `channelId` (Number or Null) 發言頻道，密頻則為 Null
+		* `type` (String) 發言類型
+			* `normal` 一般發言
+			* `private` 密頻
+			* `global` 廣播、管理訊息
+		* `message` (String) 發言內容
+
 ### user_getProfile
 取得自己的使用者資料
 #### 參數
