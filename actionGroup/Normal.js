@@ -132,6 +132,53 @@ Normal.prototype.chat_private=function(data,link){
 		});
 	}
 }
+/*
+* `type` (String) 查詢類型
+	* `public` 公開訊息，包含公告、公開聊天訊息
+	* `private` 私人訊息，包含密頻、管理員密頻
+* `channelId` (Number,選擇性) 查詢頻道，查詢類型為 `public` 時有效
+* `startTime` (Number,選擇性) 查詢在此之後發送的訊息，不可早於註冊時間，Unix Time (ms)
+* `endTime` (Number,選擇性) 查詢在此之前發送的訊息，Unix Time (ms)
+* `startMessageId` (Number,選擇性) 查詢在此編號之後的訊息
+* `limit` (Number,選擇性) 查詢結果數量限制，預設 100，最大 500
+*/
+Normal.prototype.chatlog_query=function(data,link){
+	if(
+		!['channelId','startTime','endTime','startMessageId','limit']
+			.every((v) => data.hasOwnProperty(v)? (Number.isSafeInteger(data[v]) && data[v]>0):true)
+	) return;
+	let query;
+	if(data.type=='public'){
+		query={
+			'channelId': data.channelId,
+			'type': [0,3]
+		};
+	}else if(data.type=='private'){
+		query={
+			'userId': this._user.userId,
+			'type': [1,3]
+		};
+	}else return;
+	if(data.startMessageId) query.startMessageId=data.startMessageId;
+	if(query.startTime) query.startTime=new Date(data.startTime);
+	if(query.endTime) query.endTime=new Date(data.endTime);
+	query.limit=Math.min(500,data.limit || 100);
+	let result='{"action":"chatlog_query","result":[';
+	let sp='';
+	db.getChatLog(
+		query,
+		function(message){
+			switch(message.type){
+				case 0: message.type='normal'; break;
+				case 1: message.type='private'; break;
+				case 3: message.type='global'; break;
+			}
+			result+=sp+JSON.stringify(message);
+			sp=',';
+		},
+		() => link.send(result+']}')
+	);
+}
 Normal.prototype.user_getProfile=function(data,link){
 	if(!(
 		Array.isArray(data.userIds) && 
