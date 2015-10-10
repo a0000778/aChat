@@ -303,6 +303,27 @@ Normal.prototype.user_removeSession=function(data,link){
 		});
 		
 }
+Normal.prototype.user_sendClient=function(data,link){
+	if(
+		!data.hasOwnProperty('data') && 
+		(data.hasOwnProperty('session')? (data.session=Base.toBuffer(data.session)) && user.fieldCheck.session(data.session):true)
+	) return;
+	if(data.session){
+		let toLink=link.user.findSession(data.session);
+		if(toLink)
+			toLink.send({
+				'action': 'user_sendClient',
+				'from': link.session.toString('hex'),
+				'data': data.data
+			});
+	}else{
+		link.user.send({
+			'action': 'user_sendClient',
+			'from': link.session.toString('hex'),
+			'data': data.data
+		});
+	}
+}
 Normal.prototype._quotaReset=function(_){
 	_._quota_sendMsg=Math.min(_._quota_sendMsg+quota_sendMsg,quota_sendMsg);
 }
