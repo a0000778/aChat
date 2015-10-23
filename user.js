@@ -1,10 +1,10 @@
 'use strict';
-var actionGroup=require('./actionGroup.js');
-var config=require('./config.js');
-var crypto=require('crypto');
-var db=require('./db.js');
-var domainCreate=require('domain').create;
-var util=require('util');
+let actionGroup=require('./actionGroup.js');
+let config=require('./config.js');
+let crypto=require('crypto');
+let db=require('./db.js');
+let domainCreate=require('domain').create;
+let util=require('util');
 
 const fieldCheck={
 	//資料庫欄位
@@ -19,10 +19,10 @@ const fieldCheck={
 	'question': (question) => Buffer.isBuffer(question) && question.length>7,
 	'answer': (answer) => Buffer.isBuffer(answer) && answer.length===32
 };
-var user={};
-var userListById=new Map();
-var userListByUsername=new Map();
-var sessionList=new Set();
+let user={};
+let userListById=new Map();
+let userListByUsername=new Map();
+let sessionList=new Set();
 
 Object.defineProperty(user,'sessionCount',{
 	'get': () => sessionList.size
@@ -242,7 +242,7 @@ user.removeSession=function(session,callback){
 		- password	String
 */
 user.resetPassword=function(userId,callback){
-	var password=crypto.randomBytes(4).toString('hex');
+	let password=crypto.randomBytes(4).toString('hex');
 	db.updateUserInfo(userId,{
 		'password': passwordHash(password)
 	},function(){
@@ -277,19 +277,17 @@ user.updateProfile=function(userId,userData,callback){
 }
 
 function Link(link){
-	var _=this;
-	
 	let domain=domainCreate();
 	domain.add(this);
 	domain.add(link);
-	domain.on('error',function(error){
+	domain.on('error',(error) => {
 		console.error(
 			'session=%s,userId=%d, %s',
-			_.session? _.session.toString('hex'):'null',
-			_.user? _.user.userId:'null',
+			this.session? this.session.toString('hex'):'null',
+			this.user? this.user.userId:'null',
 			error.stack
 		);
-		_.exit(4003);
+		this.exit(4003);
 	});
 	domain.enter();
 	
@@ -298,15 +296,11 @@ function Link(link){
 	this.link=link;
 	this.removeSession=false;
 	this._question=null;
-	var auth=new actionGroup.Auth(this);
+	let auth=new actionGroup.Auth(this);
 	
 	link
-		.on('close',function(){
-			_.exit();
-		})
-		.on('message',function(data){
-			auth._exec(data,_);
-		})
+		.on('close',() => this.exit())
+		.on('message',(data) => auth._exec(data,this))
 	;
 	
 	sessionList.add(this);
@@ -337,15 +331,12 @@ Link.prototype.send=function(data){
 }
 Link.prototype._setUser=function(session,userId,username,actionGroup){
 	if(this.user) return;
-	var _=this;
 	this.session=session;
 	this.user=userListById.get(userId) || new User(userId,username,actionGroup);
 	this.user.sessions.set(session.toString('hex'),this);
 	this.link
 		.removeAllListeners('message')
-		.on('message',function(data){
-			_.user.actionGroup._exec(data,_);
-		})
+		.on('message',(data) => this.user.actionGroup._exec(data,this))
 	;
 }
 
