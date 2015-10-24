@@ -19,6 +19,10 @@ Auth.prototype._umount=function(){
 	Base.prototype._umount.call(this);
 }
 Auth.timeout= (link) => link.exit(4100);
+Auth.prototype.client=function(data,link){
+	if(link.client && !(data.hasOwnProperty('client') && user.fieldCheck.client(data.client))) return;
+	link.client=data.client;
+}
 Auth.prototype.createSession=function(data,link){
 	if(this._authing || !(
 		link._question && 

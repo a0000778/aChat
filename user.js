@@ -15,6 +15,7 @@ const fieldCheck={
 	'active': (active) => typeof(active)==='boolean',
 	'actionGroup': (name) => typeof(name)==='string' && actionGroup.hasOwnProperty(name),
 	'session': (session) => Buffer.isBuffer(session) && session.length===20,
+	'client': (client) => typeof(client)==='string' && client.length<=150,
 	//臨時資料
 	'question': (question) => Buffer.isBuffer(question) && question.length>7,
 	'answer': (answer) => Buffer.isBuffer(answer) && answer.length===32
@@ -74,7 +75,7 @@ user.authBySession=function(userId,session,link,callback){
 			if(userListById.get(userId).findSession(session))
 				callback('repeat login');
 			else
-				db.updateSession(session,function(){
+				db.updateSession(session,{'lastClient': link.client},function(){
 					link._setUser(session,userId);
 					callback('success');
 				});
@@ -84,7 +85,7 @@ user.authBySession=function(userId,session,link,callback){
 					if(link.link.protocol=='adminv1' && result.actionGroup!='Admin'){
 						callback('fail');
 					}else if(result.active){
-						db.updateSession(session,function(){
+						db.updateSession(session,{'lastClient': link.client},function(){
 							link._setUser(session,userId,result.username,result.actionGroup);
 							callback('success');
 						});
@@ -294,6 +295,7 @@ function Link(link){
 	this.user=null;
 	this.session=null;
 	this.link=link;
+	this.client=null;
 	this.removeSession=false;
 	this._question=null;
 	let auth=new actionGroup.Auth(this);
