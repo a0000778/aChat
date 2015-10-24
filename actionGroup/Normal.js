@@ -289,7 +289,7 @@ Normal.prototype.user_removeSession=function(data,link){
 		return;
 	if(Buffer.compare(link.session,data.session))
 		user.removeSession(data.session,function(){
-			let sess=this._user.findSession(data.session.toString('hex'));
+			let sess=link.user.findSession(data.session.toString('hex'));
 			if(sess) sess.exit(4105);
 			link.send({
 				'action': 'user_removeSession',
