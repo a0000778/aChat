@@ -132,16 +132,6 @@ Normal.prototype.chat_private=function(data,link){
 		});
 	}
 }
-/*
-* `type` (String) 查詢類型
-	* `public` 公開訊息，包含公告、公開聊天訊息
-	* `private` 私人訊息，包含密頻、管理員密頻
-* `channelId` (Number,選擇性) 查詢頻道，查詢類型為 `public` 時有效
-* `startTime` (Number,選擇性) 查詢在此之後發送的訊息，不可早於註冊時間，Unix Time (ms)
-* `endTime` (Number,選擇性) 查詢在此之前發送的訊息，Unix Time (ms)
-* `startMessageId` (Number,選擇性) 查詢在此編號之後的訊息
-* `limit` (Number,選擇性) 查詢結果數量限制，預設 100，最大 500
-*/
 Normal.prototype.chatlog_query=function(data,link){
 	if(
 		!['channelId','startTime','endTime','startMessageId','limit']
