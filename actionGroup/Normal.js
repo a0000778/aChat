@@ -237,7 +237,9 @@ Normal.prototype.user_editProfile=function(data,link){
 		}else return;
 	}
 	var _=this;
-	user.authByPassword(this._user.username,link._question,data.answer,function(result){
+	let question=link._question;
+	link._question=null;
+	user.authByPassword(this._user.username,question,data.answer,function(result){
 		if(result=='disabled')
 			_._user.exit(4101);
 		else if(result=='fail')
