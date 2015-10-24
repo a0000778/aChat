@@ -153,10 +153,10 @@
 * `sessions` (Array)
 	* `session`	(Object)
 		* `session`		(Hex)
-		* `createTime`	(Date)
-		* `lastClient`	(String)
-		* `lastLogin`	(Date)
-		* `online`		(Boolean)
+		* `createTime`	(Number) 建立時間，Unix Time (ms)
+		* `lastClient`	(String) 最後使用的用戶端
+		* `lastLogin`	(Number) 最後登入時間，Unix Time (ms)
+		* `online`		(Boolean) 當前是否在線
 
 ### user_logout
 登出

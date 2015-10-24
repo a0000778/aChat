@@ -271,6 +271,8 @@ Normal.prototype.user_listSession=function(data,link){
 		for(let sess of result){
 			sess.online=!!u.findSession(sess.session);
 			sess.session=sess.session.toString('hex');
+			sess.createTime=new Date(sess.createTime).getTime();
+			sess.lastLogin=new Date(sess.lastLogin).getTime();
 		}
 		link.send({
 			'action': 'user_listSession',
