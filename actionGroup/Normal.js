@@ -173,6 +173,7 @@ Normal.prototype.chatlog_query=function(data,link){
 				case 1: message.type='private'; break;
 				case 3: message.type='global'; break;
 			}
+			message.time=new Date(message.time).getTime();
 			result+=sp+JSON.stringify(message);
 			sp=',';
 		},
