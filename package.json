@@ -1,15 +1,15 @@
 {
 	"name": "aChat",
 	"description": "聊天室伺服器",
-	"version": "2.0.0-beta",
+	"version": "2.0.0-rc1",
 	"licence": "MIT License",
 	"author": "a0000778",
 	"keywords": ["chat"],
 	"dependencies": {
 		"formidable": "^1.0.17",
 		"light-router": "^0.1.11",
-		"nodemailer": "^1.4.0",
-		"websocket": "^1.0.21",
+		"nodemailer": "^1.8.0",
+		"websocket": "^1.0.22",
 		"mysql": "^2.9.0"
 	},
 	"engines": {
