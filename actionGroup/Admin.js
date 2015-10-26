@@ -19,7 +19,7 @@ Admin.prototype.admin_channel_create=function(data,link){
 				'action': 'admin_channel_create',
 				'status': 'success'
 			});
-			_._allUserExec('Normal',{'action':'channel_list'},Base.makeChannelList());
+			_._allUserExec({'action':'channel_list'},Base.makeChannelList());
 		});
 	}
 }
@@ -33,7 +33,7 @@ Admin.prototype.admin_channel_edit=function(data,link){
 					'action': 'admin_channel_edit',
 					'status': 'success'
 				});
-				_._allUserExec('Normal',{'action':'channel_list'},Base.makeChannelList());
+				_._allUserExec({'action':'channel_list'},Base.makeChannelList());
 			});
 		}else{
 			link.send({
@@ -71,7 +71,7 @@ Admin.prototype.admin_channel_delete=function(data,link){
 					'action': 'admin_channel_delete',
 					'status': 'success'
 				});
-				_._allUserExec('Normal',{'action':'channel_list'},Base.makeChannelList());
+				_._allUserExec({'action':'channel_list'},Base.makeChannelList());
 			});
 		}else{
 			link.send({
@@ -191,25 +191,12 @@ Admin.prototype.admin_chat_global=function(data,link){
 		});
 	}
 }
-Admin.prototype._allUserExec=function(actionGroup,action){
-	let extArgs=Array.prototype.slice.call(arguments,2);
-	if(Array.isArray(actionGroup)){
-		for(let u of user.listUser()){
-			if(actionGroup.indexOf(u.actionGroup.constructor.name)!==-1){
-				for(let s of u.sessions.values()){
-					let args=[action,s].concat(extArgs);
-					u.actionGroup._execObject.apply(u.actionGroup,args);
-				}
-			}
-		}
-	}else if(typeof(actionGroup)==='string'){
-		for(let u of user.listUser()){
-			if(u.actionGroup.constructor.name===actionGroup){
-				for(let s of u.sessions.values()){
-					let args=[action,s].concat(extArgs);
-					u.actionGroup._execObject.apply(u.actionGroup,args);
-				}
-			}
+Admin.prototype._allUserExec=function(action){
+	let extArgs=Array.prototype.slice.call(arguments,1);
+	for(let u of user.listUser()){
+		for(let s of u.sessions.values()){
+			let args=[action,s].concat(extArgs);
+			u.actionGroup._execObject.apply(u.actionGroup,args);
 		}
 	}
 }
