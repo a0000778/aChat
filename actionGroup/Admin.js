@@ -192,18 +192,23 @@ Admin.prototype.admin_chat_global=function(data,link){
 	}
 }
 Admin.prototype._allUserExec=function(actionGroup,action){
+	let extArgs=Array.prototype.slice.call(arguments,2);
 	if(Array.isArray(actionGroup)){
 		for(let u of user.listUser()){
 			if(actionGroup.indexOf(u.actionGroup.constructor.name)!==-1){
-				let args=[u].concat(Array.prototype.slice.call(arguments,1));
-				u.actionGroup._execObject.apply(u.actionGroup,args);
+				for(let s of u.sessions.values()){
+					let args=[action,s].concat(extArgs);
+					u.actionGroup._execObject.apply(u.actionGroup,args);
+				}
 			}
 		}
 	}else if(typeof(actionGroup)==='string'){
 		for(let u of user.listUser()){
 			if(u.actionGroup.constructor.name===actionGroup){
-				let args=[u].concat(Array.prototype.slice.call(arguments,1));
-				u.actionGroup._execObject.apply(u.actionGroup,args);
+				for(let s of u.sessions.values()){
+					let args=[action,s].concat(extArgs);
+					u.actionGroup._execObject.apply(u.actionGroup,args);
+				}
 			}
 		}
 	}
