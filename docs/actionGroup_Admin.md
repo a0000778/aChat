@@ -1,7 +1,7 @@
 # Admin 指令集
 管理用指令集，繼承 Normal 指令集。
 ## 用戶端主動發送指令列表
-### channel_create
+### admin_channel_create
 新增頻道
 #### 參數
 * `name` (Number) 新頻道名稱
@@ -11,7 +11,7 @@
 * `status` (String)
 	* success - 新增成功
 
-###channel_edit
+### admin_channel_edit
 修改頻道選項
 #### 參數
 * `channelId` (Number) 目標頻道ID
@@ -25,7 +25,7 @@
 
 ※沒有任何修改項目時將不傳回任何結果
 
-###channel_delete
+### admin_channel_delete
 刪除頻道
 #### 參數
 * `channelId` (Number) 目標頻道ID
@@ -38,7 +38,7 @@
 	* default channel - 刪除目標為預設頻道
 	* default channel not exists - 預設頻道不存在，無法進行頻道刪除動作
 
-###user_kick
+### admin_user_kick
 踢使用者下線
 #### 參數
 * `userId` (Number) 目標使用者ID
@@ -49,7 +49,7 @@
 	* success - 成功
 	* not exists - 目標不在線
 
-###user_ban
+### admin_user_ban
 停用使用者帳號，在線則順便踢下線
 #### 參數
 * `userId` (Number) 目標使用者ID
@@ -60,7 +60,7 @@
 	* success - 成功
 	* not exists - 目標不存在
 
-###user_unban
+### admin_user_unban
 啟用使用者帳號
 #### 參數
 * `userId` (Number) 目標使用者ID
@@ -71,7 +71,7 @@
 	* success - 成功
 	* not exists - 目標不存在
 
-###chat_global
+### admin_chat_global
 以廣播頻道發言，可全伺服器、特定頻道、特定使用者
 #### 參數
 * `channelId` (Number,選擇性) 目標頻道ID
