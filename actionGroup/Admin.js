@@ -83,7 +83,7 @@ Admin.prototype.admin_channel_delete=function(data,link){
 }
 Admin.prototype.admin_user_kick=function(data,link){
 	if(user.fieldCheck.userId(data.userId)){
-		let u=user.findById(data.userId);
+		let u=user.findUser('userId',data.userId);
 		if(user){
 			user.exit(4104);
 			link.send({
