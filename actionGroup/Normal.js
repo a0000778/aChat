@@ -50,7 +50,7 @@ Normal.prototype.channel_switch=function(data,link){
 	}
 }
 Normal.prototype.channel_userList=function(data,link,channelId,list){
-	let ch,userList;
+	let ch;
 	if(data.hasOwnProperty('channelId')){
 		if(!(Number.isSafeInteger(data.channelId) && data.channelId>0)) return;
 		ch=channel.findById(data.channelId);
@@ -63,10 +63,10 @@ Normal.prototype.channel_userList=function(data,link,channelId,list){
 		}
 	}else{
 		ch=this._user.channel;
-		userList=[];
-		for(let u of ch.list())
-			userList.push(u.userId);
 	}
+	let userList=[];
+	for(let u of ch.list())
+		userList.push(u.userId);
 	link.send({
 		'action': 'channel_userList',
 		'status': 'success',
