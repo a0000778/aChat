@@ -41,7 +41,7 @@ Object.defineProperty(db,'queryQueueCount',{
 		- callback	Function
 	*/
 	db.updateChannel=function(channelId,newName,callback){
-		pool.query('UPDATE `channel` SET `name`=? WHERE `channelId`=?;',[name,channelId],function(error,result){
+		pool.query('UPDATE `channel` SET `name`=? WHERE `channelId`=?;',[newName,channelId],function(error,result){
 			if(error) throw error;
 			if(result.changedRows)
 				callback();
