@@ -7,7 +7,7 @@
 * `name` (Number) 新頻道名稱
 
 #### 返回結果
-* `action` (String) channel_create
+* `action` (String) admin_channel_create
 * `status` (String)
 	* success - 新增成功
 
@@ -18,7 +18,7 @@
 * `name` (String,選擇性) 新頻道名稱
 
 #### 返回結果
-* `action` (String) channel_edit
+* `action` (String) admin_channel_edit
 * `status` (String)
 	* success - 修改成功
 	* not exists - 修改目標不存在
@@ -31,7 +31,7 @@
 * `channelId` (Number) 目標頻道ID
 
 #### 返回結果
-* `action` (String) channel_delete
+* `action` (String) admin_channel_delete
 * `status` (String)
 	* success - 刪除成功
 	* not exists - 刪除目標不存在
@@ -44,7 +44,7 @@
 * `userId` (Number) 目標使用者ID
 
 #### 返回結果
-* `action` (String) user_kick
+* `action` (String) admin_user_kick
 * `status` (String)
 	* success - 成功
 	* not exists - 目標不在線
@@ -55,7 +55,7 @@
 * `userId` (Number) 目標使用者ID
 
 #### 返回結果
-* `action` (String) user_ban
+* `action` (String) admin_user_ban
 * `status` (String)
 	* success - 成功
 	* not exists - 目標不存在
@@ -66,7 +66,7 @@
 * `userId` (Number) 目標使用者ID
 
 #### 返回結果
-* `action` (String) user_unban
+* `action` (String) admin_user_unban
 * `status` (String)
 	* success - 成功
 	* not exists - 目標不存在
@@ -80,7 +80,7 @@
 
 ※`channelId`, `userId` 只能同時選擇其一，同時存在的情況下將優先選擇 `userId`，都不存在則向全伺服器廣播
 #### 返回結果
-* `action` (String) chat_global
+* `action` (String) admin_chat_global
 * `status` (String)
 	* success - 成功
 	* fail - 失敗，目標不存在、不在線
