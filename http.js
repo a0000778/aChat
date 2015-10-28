@@ -197,10 +197,11 @@ if(config.debug) router.get('/v1/status',function(req,res){
 		let u=sess.user
 		if(u){
 			outputContent+=util.format(
-				'%s: userId=%d, session=%s, username=%s, actionGroup=%s, channel=%s(%d)\n',
+				'%s: userId=%d, session=%s, client=%s, username=%s, actionGroup=%s, channel=%s(%d)\n',
 				sess.link.remoteAddress,
 				u.userId,
 				sess.session.toString('hex'),
+				sess.client || '(未知)',
 				u.username,
 				u.actionGroup.constructor.name,
 				u.channel && u.channel.name,
