@@ -86,7 +86,7 @@ user.authBySession=function(userId,session,link,callback){
 						callback('fail');
 					}else if(result.active){
 						db.updateSession(session,{'lastClient': link.client},function(){
-							link._setUser(session,userId,result.username,result.actionGroup);
+							link._setUser(session,userId,result);
 							callback('success');
 						});
 					}else
@@ -331,10 +331,10 @@ Link.prototype.send=function(data){
 		this.link.sendUTF(typeof(data)==='string'? data:JSON.stringify(data));
 	return true;
 }
-Link.prototype._setUser=function(session,userId,username,actionGroup){
+Link.prototype._setUser=function(session,userId,userData){
 	if(this.user) return;
 	this.session=session;
-	this.user=userListById.get(userId) || new User(userId,username,actionGroup);
+	this.user=userListById.get(userId) || new User(userData);
 	this.user.sessions.set(session.toString('hex'),this);
 	this.link
 		.removeAllListeners('message')
@@ -342,11 +342,12 @@ Link.prototype._setUser=function(session,userId,username,actionGroup){
 	;
 }
 
-function User(userId,username,actionGroupName){
-	this.userId=userId;
-	this.username=username;
+function User(userData){
+	this.userId=userData.userId;
+	this.username=userData.username;
+	this.regTime=new Date(userData.regTime);
 	this.channel=null;
-	this.actionGroup=new actionGroup[actionGroupName](this);
+	this.actionGroup=new actionGroup[userData.actionGroup](this);
 	this.sessions=new Map();
 	
 	userListById.set(this.userId,this);
