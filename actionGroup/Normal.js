@@ -181,7 +181,7 @@ Normal.prototype.user_getProfile=function(data,link){
 	var _=this;
 	data.userIds.forEach(function(userId){
 		let u;
-		if(userId!==_._user.userId && u=user.findUser('userId',userId)){
+		if(userId!==_._user.userId && (u=user.findUser('userId',userId))){
 			link.send({
 				'action': 'user_getProfile',
 				'status': 'success',
