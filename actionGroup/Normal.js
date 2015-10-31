@@ -180,36 +180,49 @@ Normal.prototype.user_getProfile=function(data,link){
 	)) return;
 	var _=this;
 	data.userIds.forEach(function(userId){
-		user.getProfile(userId,function(result){
-			if(result===null){
-				link.send({
-					'action': 'user_getProfile',
-					'status': 'fail',
-					'profile': {'userId': userId}
-				});
-			}else if(userId===_._user.userId){
-				link.send({
-					'action': 'user_getProfile',
-					'status': 'success',
-					'profile': {
-						'userId': result.userId,
-						'username': result.username,
-						'email': result.email,
-						'regTime': result.regTime.getTime()
-					}
-				});
-			}else{
-				link.send({
-					'action': 'user_getProfile',
-					'status': 'success',
-					'profile': {
-						'userId': result.userId,
-						'username': result.username,
-						'regTime': result.regTime.getTime()
-					}
-				});
-			}
-		});
+		let u;
+		if(userId!==_._user.userId && u=user.findUser('userId',userId)){
+			link.send({
+				'action': 'user_getProfile',
+				'status': 'success',
+				'profile': {
+					'userId': u.userId,
+					'username': u.username,
+					'regTime': u.regTime.getTime()
+				}
+			});
+		}else{
+			user.getProfile(userId,function(result){
+				if(result===null){
+					link.send({
+						'action': 'user_getProfile',
+						'status': 'fail',
+						'profile': {'userId': userId}
+					});
+				}else if(userId===_._user.userId){
+					link.send({
+						'action': 'user_getProfile',
+						'status': 'success',
+						'profile': {
+							'userId': result.userId,
+							'username': result.username,
+							'email': result.email,
+							'regTime': result.regTime.getTime()
+						}
+					});
+				}else{
+					link.send({
+						'action': 'user_getProfile',
+						'status': 'success',
+						'profile': {
+							'userId': result.userId,
+							'username': result.username,
+							'regTime': result.regTime.getTime()
+						}
+					});
+				}
+			});
+		}
 	});
 }
 Normal.prototype.user_editProfile=function(data,link){
