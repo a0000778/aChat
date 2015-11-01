@@ -338,9 +338,8 @@ Object.defineProperty(db,'queryQueueCount',{
 	
 	pool.query('SELECT `messageId` FROM `chatlog` ORDER BY `messageId` DESC LIMIT 1;',function(error,result){
 		if(error){
-			console.error('無法確認最後的聊天記錄編號！')
+			console.error('無法確認最後的聊天記錄編號！');
 			throw error;
-			process.exit();
 		}
 		if(result.length)
 			lastMessageId=result[0].messageId;
