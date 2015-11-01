@@ -229,6 +229,18 @@ Object.defineProperty(db,'queryQueueCount',{
 
 /* Chat Log */
 {
+	const cacheMessageFilter={
+		'startMessageId': (filter,message) => message[0]>=filter.startMessageId,
+		'startTime': (filter,message) => message[1]>filter.startTime,
+		'endTime': (filter,message) => message[1]<filter.endTime,
+		'userId': (filter,message) => filter.userId===message[4] || filter.userId===message[5],
+		'userId_IN': (filter,message) => filter.userId.indexOf(message[4])!==-1 || filter.userId===message[5],
+		'toUserIdIsNull': (filter,message) => message[5]===null,//去除指向性廣播用
+		'channelId': (filter,message) => filter.channelId===message[3],
+		'channelId_IN': (filter,message) => filter.channelId.indexOf(message[3])!==-1,
+		'type': (filter,message) => filter.type===message[2],
+		'type_IN': (filter,message) => filter.type.indexOf(message[2])!==-1
+	}
 	let chatLogCache=[];
 	let writingCache=0;
 	let lastMessageId=0;
@@ -237,6 +249,8 @@ Object.defineProperty(db,'queryQueueCount',{
 	db.getChatLog=function(filter,each,callback){
 		const fields=['startMessageId','startTime','endTime','userId','channelId','type','limit'];
 		filter=filter || {};
+		let cacheSnapshot=chatLogCache.slice();
+		let resultLimit=Number.Infinity;
 		let where=[];
 		let limit='';
 		let args=[];
@@ -246,16 +260,25 @@ Object.defineProperty(db,'queryQueueCount',{
 		typeof(filter.startTime)!='undefined' && where.push('`time`>?') && args.push(filter.startTime);
 		typeof(filter.endTime)!='undefined' && where.push('`time`<?') && args.push(filter.endTime);
 		typeof(filter.userId)!='undefined' && where.push('(`fromUserId`'+sql_isOrIn(filter.userId)+' OR `toUserId`'+sql_isOrIn(filter.userId)+')') && args.push(filter.userId,filter.userId);
+		typeof(filter.userId)=='undefined' && where.push('`toUserId` IS NULL');//去除指向性廣播用
 		typeof(filter.channelId)!='undefined' && where.push('`channelId`'+sql_isOrIn(filter.channelId)) && args.push(filter.channelId);
 		typeof(filter.type)!='undefined' && where.push('`type`'+sql_isOrIn(filter.type)) && args.push(filter.type);
-		filter.userId===undefined && where.push('`toUserId` IS NULL');
-		filter.limit>0 && (limit=' LIMIT ?') && args.push(filter.limit);
+		filter.limit>0 && (resultLimit=filter.limit) && (limit=' LIMIT ?') && args.push(filter.limit);
 		pool.query(
 			'SELECT * FROM `chatlog`'+(where.length? ' WHERE '+where.join(' AND '):'')+limit+';',
 			args
 		)
-			.on('result',each)
-			.on('end',callback)
+			.on('result',function(message){
+				resultLimit--;
+				each(message);
+			})
+			.on('end',function(){
+				if(resultLimit>0){
+					filter.limit=resultLimit;
+					queryCache(filter,cacheSnapshot,each,callback);
+				}else
+					callback();
+			})
 		;
 	}
 	db.writeChatLog=function(time,type,channelId,fromUserId,toUserId,msg){
@@ -274,6 +297,26 @@ Object.defineProperty(db,'queryQueueCount',{
 	}
 	db.chatLogCacheCount=function(){
 		return chatLogCache.length;
+	}
+	function queryCache(filter,snapshot,each,callback){
+		snapshot=snapshot.entries();
+		let filterBuild=[];
+		typeof(filter.startMessageId)!='undefined' && filterBuild.push(cacheMessageFilter.startMessageId);
+		typeof(filter.startTime)!='undefined' && filterBuild.push(cacheMessageFilter.startTime);
+		typeof(filter.endTime)!='undefined' && filterBuild.push(cacheMessageFilter.endTime);
+		typeof(filter.userId)!='undefined' && filterBuild.push(Array.isArray(filter.userId)? cacheMessageFilter.userId_IN:cacheMessageFilter.userId);
+		typeof(filter.userId)=='undefined' && filterBuild.push(cacheMessageFilter.toUserIdIsNull);//去除指向性廣播用
+		typeof(filter.channelId)!='undefined' && filterBuild.push(Array.isArray(filter.channelId)? cacheMessageFilter.channelId_IN:cacheMessageFilter.channelId);
+		typeof(filter.type)!='undefined' && filterBuild.push(Array.isArray(filter.type)? cacheMessageFilter.type_IN:cacheMessageFilter.type);
+		let limit=filter.limit || Number.Infinity;
+		for(let message of snapshot){
+			message=message[1];
+			if(filterBuild.every((messageFilter) => messageFilter(filter,message))){
+				each(message);
+				if(!--limit) break;
+			}
+		}
+		callback();
 	}
 	function writeChatLog(force){
 		writingCache=Math.min(chatLogCache.length,config.chatLogCacheCount);
@@ -306,7 +349,7 @@ Object.defineProperty(db,'queryQueueCount',{
 }
 
 function sql_isOrIn(value){
-	return Array.isArray(value)? ' IN (?)':'=?';
+	return (Array.isArray(value) && value.length!==1)? ' IN (?)':'=?';
 }
 
 module.exports=db;
