@@ -150,9 +150,9 @@ Normal.prototype.chatlog_query=function(data,link){
 		};
 	}else return;
 	if(data.startMessageId) query.startMessageId=data.startMessageId;
-	if(query.startTime) query.startTime=new Date(Math.max(link.user.regTime,data.startTime));
+	if(data.startTime) query.startTime=new Date(Math.max(link.user.regTime,data.startTime));
 	else query.startTime=link.user.regTime;
-	if(query.endTime) query.endTime=new Date(data.endTime);
+	if(data.endTime) query.endTime=new Date(data.endTime);
 	query.limit=Math.min(500,data.limit || 100);
 	let result='{"action":"chatlog_query","result":[';
 	let sp='';
