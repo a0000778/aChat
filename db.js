@@ -231,6 +231,7 @@ Object.defineProperty(db,'queryQueueCount',{
 {
 	let chatLogCache=[];
 	let writingCache=0;
+	let lastMessageId=0;
 	let writeTTL;
 	
 	db.getChatLog=function(filter,each,callback){
@@ -260,7 +261,7 @@ Object.defineProperty(db,'queryQueueCount',{
 	db.writeChatLog=function(time,type,channelId,fromUserId,toUserId,msg){
 		let at=0;
 		while(at<msg.length){
-			chatLogCache.push([time,type,channelId,fromUserId,toUserId,msg.substr(at,255)]);
+			chatLogCache.push([++lastMessageId,time,type,channelId,fromUserId,toUserId,msg.substr(at,255)]);
 			at+=255;
 		}
 		db.writeChatLogNow();
@@ -277,7 +278,7 @@ Object.defineProperty(db,'queryQueueCount',{
 	function writeChatLog(force){
 		writingCache=Math.min(chatLogCache.length,config.chatLogCacheCount);
 		pool.query(
-			'INSERT INTO `chatlog` (`time`,`type`,`channelId`,`fromUserId`,`toUserId`,`message`) VALUES ?;',
+			'INSERT INTO `chatlog` (`messageId`,`time`,`type`,`channelId`,`fromUserId`,`toUserId`,`message`) VALUES ?;',
 			[chatLogCache.slice(0,writingCache)],
 			function(error,result){
 				if(error){
@@ -292,6 +293,15 @@ Object.defineProperty(db,'queryQueueCount',{
 		);
 	}
 	
+	pool.query('SELECT `messageId` FROM `chatlog` ORDER BY `messageId` DESC LIMIT 1;',function(error,result){
+		if(error){
+			console.error('無法確認最後的聊天記錄編號！')
+			throw error;
+			process.exit();
+		}
+		if(result.length)
+			lastMessageId=result[0].messageId;
+	});
 	writeTTL=setTimeout(db.writeChatLogNow,60000,true);
 }
 
