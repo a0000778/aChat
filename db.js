@@ -312,7 +312,15 @@ Object.defineProperty(db,'queryQueueCount',{
 		for(let message of snapshot){
 			message=message[1];
 			if(filterBuild.every((messageFilter) => messageFilter(filter,message))){
-				each(message);
+				each({
+					'messageId': message[0],
+					'time': message[1].toISOString(),
+					'type': message[2],
+					'channelId': message[3],
+					'fromUserId': message[4],
+					'toUserId': message[5],
+					'message': message[6]
+				});
 				if(!--limit) break;
 			}
 		}
