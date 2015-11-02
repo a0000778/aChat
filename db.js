@@ -250,7 +250,7 @@ Object.defineProperty(db,'queryQueueCount',{
 		const fields=['startMessageId','startTime','endTime','userId','channelId','type','limit'];
 		filter=filter || {};
 		let cacheSnapshot=chatLogCache.slice();
-		let resultLimit=Number.Infinity;
+		let resultLimit=Infinity;
 		let where=[];
 		let limit='';
 		let args=[];
@@ -308,7 +308,7 @@ Object.defineProperty(db,'queryQueueCount',{
 		typeof(filter.userId)=='undefined' && filterBuild.push(cacheMessageFilter.toUserIdIsNull);//去除指向性廣播用
 		typeof(filter.channelId)!='undefined' && filterBuild.push(Array.isArray(filter.channelId)? cacheMessageFilter.channelId_IN:cacheMessageFilter.channelId);
 		typeof(filter.type)!='undefined' && filterBuild.push(Array.isArray(filter.type)? cacheMessageFilter.type_IN:cacheMessageFilter.type);
-		let limit=filter.limit || Number.Infinity;
+		let limit=filter.limit || Infinity;
 		for(let message of snapshot){
 			message=message[1];
 			if(filterBuild.every((messageFilter) => messageFilter(filter,message))){
