@@ -140,9 +140,9 @@ Normal.prototype.chatlog_query=function(data,link){
 	let query;
 	if(data.type=='public'){
 		query={
-			'channelId': data.channelId,
 			'type': [0,3]
 		};
+		if(data.channelId) query.channelId=data.channelId;
 	}else if(data.type=='private'){
 		query={
 			'userId': this._user.userId,
