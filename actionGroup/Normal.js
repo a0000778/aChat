@@ -134,20 +134,20 @@ Normal.prototype.chat_private=function(data,link){
 }
 Normal.prototype.chatlog_query=function(data,link){
 	if(
-		!['channelId','startTime','endTime','startMessageId','limit']
+		!['channelId','userId','startTime','endTime','startMessageId','limit']
 			.every((v) => data.hasOwnProperty(v)? (Number.isSafeInteger(data[v]) && data[v]>0):true)
 	) return;
 	let query;
 	if(data.type=='public'){
-		query={
-			'type': [0,3]
-		};
+		query={'type': [0,3]};
 		if(data.channelId) query.channelId=data.channelId;
 	}else if(data.type=='private'){
-		query={
-			'userId': this._user.userId,
-			'type': [1,3]
-		};
+		query={'type': [1,3]};
+		if(data.userId){
+			query.userId2=[this._user.userId,data.userId];
+		}else{
+			query.userId=this._user.userId;
+		}
 	}else return;
 	if(data.startMessageId) query.startMessageId=data.startMessageId;
 	if(data.startTime) query.startTime=new Date(Math.max(link.user.regTime,data.startTime));

@@ -234,7 +234,7 @@ Object.defineProperty(db,'queryQueueCount',{
 		'startTime': (filter,message) => message[1]>filter.startTime,
 		'endTime': (filter,message) => message[1]<filter.endTime,
 		'userId': (filter,message) => filter.userId===message[4] || filter.userId===message[5],
-		'userId_IN': (filter,message) => filter.userId.indexOf(message[4])!==-1 || filter.userId===message[5],
+		'userId2': (filter,message) => (filter.userId[0]===message[4] && filter.userId[1]===message[5]) || (filter.userId[0]===message[5] && filter.userId[1]===message[4]),
 		'toUserIdIsNull': (filter,message) => message[5]===null,//去除指向性廣播用
 		'channelId': (filter,message) => filter.channelId===message[3],
 		'channelId_IN': (filter,message) => filter.channelId.indexOf(message[3])!==-1,
@@ -259,8 +259,13 @@ Object.defineProperty(db,'queryQueueCount',{
 		typeof(filter.startMessageId)!='undefined' && where.push('`messageId`>=?') && args.push(filter.startMessageId);
 		typeof(filter.startTime)!='undefined' && where.push('`time`>?') && args.push(filter.startTime);
 		typeof(filter.endTime)!='undefined' && where.push('`time`<?') && args.push(filter.endTime);
-		typeof(filter.userId)!='undefined' && where.push('(`fromUserId`'+sql_isOrIn(filter.userId)+' OR `toUserId`'+sql_isOrIn(filter.userId)+')') && args.push(filter.userId,filter.userId);
-		typeof(filter.userId)=='undefined' && where.push('`toUserId` IS NULL');//去除指向性廣播用
+		if(typeof(filter.userId)!='undefined'){
+			where.push('(`fromUserId`=? OR `toUserId`=?)') && args.push(filter.userId,filter.userId);
+		}else if(typeof(filter.userId2)!='undefined'){
+			where.push('((`fromUserId`=? AND `toUserId`=?) OR (`fromUserId`=? AND `toUserId`=?))') && args.push(filter.userId2[0],filter.userId2[1],filter.userId2[1],filter.userId2[0]);
+		}else{//去除指向性廣播用
+			where.push('`toUserId` IS NULL');
+		}
 		typeof(filter.channelId)!='undefined' && where.push('`channelId`'+sql_isOrIn(filter.channelId)) && args.push(filter.channelId);
 		typeof(filter.type)!='undefined' && where.push('`type`'+sql_isOrIn(filter.type)) && args.push(filter.type);
 		filter.limit>0 && (resultLimit=filter.limit) && (limit=' LIMIT ?') && args.push(filter.limit);
@@ -304,8 +309,13 @@ Object.defineProperty(db,'queryQueueCount',{
 		typeof(filter.startMessageId)!='undefined' && filterBuild.push(cacheMessageFilter.startMessageId);
 		typeof(filter.startTime)!='undefined' && filterBuild.push(cacheMessageFilter.startTime);
 		typeof(filter.endTime)!='undefined' && filterBuild.push(cacheMessageFilter.endTime);
-		typeof(filter.userId)!='undefined' && filterBuild.push(Array.isArray(filter.userId)? cacheMessageFilter.userId_IN:cacheMessageFilter.userId);
-		typeof(filter.userId)=='undefined' && filterBuild.push(cacheMessageFilter.toUserIdIsNull);//去除指向性廣播用
+		if(typeof(filter.userId)!='undefined'){
+			filterBuild.push(cacheMessageFilter.userId);
+		}else if(typeof(filter.userId2)!='undefined'){
+			filterBuild.push(cacheMessageFilter.userId2);
+		}else{//去除指向性廣播用
+			filterBuild.push(cacheMessageFilter.toUserIdIsNull);
+		}
 		typeof(filter.channelId)!='undefined' && filterBuild.push(Array.isArray(filter.channelId)? cacheMessageFilter.channelId_IN:cacheMessageFilter.channelId);
 		typeof(filter.type)!='undefined' && filterBuild.push(Array.isArray(filter.type)? cacheMessageFilter.type_IN:cacheMessageFilter.type);
 		let limit=filter.limit || Infinity;
