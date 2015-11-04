@@ -4,6 +4,7 @@ let util=require('util');
 let Base=require('./Base.js');
 let channel=require('../channel.js');
 let config=require('../config.js');
+let db=require('../db.js');
 let user=require('../user.js');
 let actionGroup=require('../actionGroup.js');
 
@@ -61,7 +62,7 @@ Auth.prototype.authBySession=function(data,link){
 	)) return;
 	let _=this;
 	this._authing=true;
-	user.authBySession(data.userId,data.session,link,function(result){
+	user.authBySession(data.userId,data.session,link,function(result,sessionData){
 		if(result=='disabled')
 			link.exit(4101);
 		else if(result=='fail')
@@ -80,6 +81,28 @@ Auth.prototype.authBySession=function(data,link){
 				'status': 'default',
 				'channelId': link.user.channel.channelId
 			});
+			if(link.user.sessions.size===1){
+				let messageCount=0;
+				db.getChatLog({
+					'startMessageId': sessionData.messageId,
+					'userId': data.userId,
+					'type': 1
+				},function(message){
+					messageCount++;
+					message.action='chat_private';
+					message.time=new Date(message.time).getTime();
+					delete message.type;
+					link.send(message);
+				},function(){
+					if(messageCount){
+						link.send({
+							'action': 'chat_notice',
+							'msg': '共計 '+messageCount+' 筆離線留言',
+							'time': Date.now()
+						});
+					}
+				});
+			}
 		}
 		_._umount();
 		_._authing=false;

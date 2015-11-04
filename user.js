@@ -73,8 +73,8 @@ user.authByPassword=function(username,question,answer,callback){
 user.authBySession=function(userId,session,link,callback){
 	if(!(fieldCheck.userId(userId) && fieldCheck.session(session)))
 		throw new Error('field format error');
-	db.getSession(session,function(result){
-		if(!result || result.userId!==userId)
+	db.getSession(session,function(sessionData){
+		if(!result || sessionData.userId!==userId)
 			callback('fail');
 		else if(userListById.has(userId)){
 			if(userListById.get(userId).findSession(session))
@@ -82,17 +82,17 @@ user.authBySession=function(userId,session,link,callback){
 			else
 				db.updateSession(session,{'lastClient': link.client},function(){
 					link._setUser(session,userId);
-					callback('success');
+					callback('success',sessionData);
 				});
 		}else{
-			db.getUserData('userId',userId,function(result){
-				if(result){
-					if(link.link.protocol=='adminv1' && result.actionGroup!='Admin'){
+			db.getUserData('userId',userId,function(userData){
+				if(userData){
+					if(link.link.protocol=='adminv1' && userData.actionGroup!='Admin'){
 						callback('fail');
-					}else if(result.active){
+					}else if(userData.active){
 						db.updateSession(session,{'lastClient': link.client},function(){
-							link._setUser(session,userId,result);
-							callback('success');
+							link._setUser(session,userId,userData);
+							callback('success',sessionData);
 						});
 					}else
 						callback('disabled');
