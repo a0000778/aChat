@@ -148,7 +148,7 @@ Admin.prototype.admin_chat_global=function(data,link){
 				'time': time.getTime(),
 				'msg': data.msg
 			});
-			db.writeChatLog(time,3,null,this._user.userId,data.userId,data.msg);
+			user.lastMessageId=db.writeChatLog(time,3,null,this._user.userId,data.userId,data.msg);
 			link.send({
 				'action': 'admin_chat_global',
 				'status': 'success'
@@ -167,7 +167,7 @@ Admin.prototype.admin_chat_global=function(data,link){
 				'time': time.getTime(),
 				'msg': data.msg
 			});
-			db.writeChatLog(time,3,data.channelId,this._user.userId,null,data.msg);
+			user.lastMessageId=db.writeChatLog(time,3,data.channelId,this._user.userId,null,data.msg);
 			link.send({
 				'action': 'admin_chat_global',
 				'status': 'success'
@@ -184,7 +184,7 @@ Admin.prototype.admin_chat_global=function(data,link){
 			'time': time.getTime(),
 			'msg': data.msg
 		});
-		db.writeChatLog(time,3,null,this._user.userId,null,data.msg);
+		user.lastMessageId=db.writeChatLog(time,3,null,this._user.userId,null,data.msg);
 		link.send({
 			'action': 'admin_chat_global',
 			'status': 'success'

@@ -94,7 +94,7 @@ Normal.prototype.chat_normal=function(data,link){
 		'msg': data.msg,
 		'time': time.getTime()
 	});
-	db.writeChatLog(time,0,this._user.channel.channelId,this._user.userId,null,data.msg);
+	user.lastMessageId=db.writeChatLog(time,0,this._user.channel.channelId,this._user.userId,null,data.msg);
 }
 Normal.prototype.chat_private=function(data,link){
 	if(!(
@@ -123,7 +123,7 @@ Normal.prototype.chat_private=function(data,link){
 		});
 		target.send(sendData);
 		this._user.send(sendData);
-		db.writeChatLog(time,1,null,this._user.userId,target.userId,data.msg);
+		user.lastMessageId=db.writeChatLog(time,1,null,this._user.userId,target.userId,data.msg);
 	}else{
 		this._user.send({
 			'action': 'chat_private',

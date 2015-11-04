@@ -24,12 +24,17 @@ let user={};
 let userListById=new Map();
 let userListByUsername=new Map();
 let sessionList=new Set();
+let lastMessageId=0;
 
 Object.defineProperty(user,'sessionCount',{
 	'get': () => sessionList.size
 });
 Object.defineProperty(user,'userCount',{
 	'get': () => userListById.size
+});
+Object.defineProperty(user,'lastMessageId',{
+	'get': () => lastMessageId,
+	'set': (v) => lastMessageId=v
 });
 user.fieldCheck=fieldCheck;
 /*
@@ -319,8 +324,14 @@ Link.prototype.exit=function(code){
 	if(this.session){
 		if(this.removeSession)
 			db.removeSession(this.session);
-		else
-			db.updateSession(this.session);
+		else{
+			if(lastMessageId)
+				db.updateSession(this.session,{
+					'messageId': lastMessageId
+				});
+			else
+				db.updateSession(this.session);
+		}
 	}
 }
 Link.prototype.send=function(data){

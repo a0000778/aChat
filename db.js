@@ -293,6 +293,7 @@ Object.defineProperty(db,'queryQueueCount',{
 			at+=16383;
 		}
 		db.writeChatLogNow();
+		return lastMessageId;
 	}
 	db.writeChatLogNow=function(force){
 		if(chatLogCache.length<config.chatLogCacheCount && !force) return;
