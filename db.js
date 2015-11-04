@@ -289,8 +289,8 @@ Object.defineProperty(db,'queryQueueCount',{
 	db.writeChatLog=function(time,type,channelId,fromUserId,toUserId,msg){
 		let at=0;
 		while(at<msg.length){
-			chatLogCache.push([++lastMessageId,time,type,channelId,fromUserId,toUserId,msg.substr(at,255)]);
-			at+=255;
+			chatLogCache.push([++lastMessageId,time,type,channelId,fromUserId,toUserId,msg.substr(at,16383)]);
+			at+=16383;
 		}
 		db.writeChatLogNow();
 	}

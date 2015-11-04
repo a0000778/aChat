@@ -13,7 +13,7 @@ CREATE TABLE `chatlog` (
   `toUserId` int(10) unsigned DEFAULT NULL COMMENT '密頻目標id',
   `channelId` smallint(5) unsigned DEFAULT NULL COMMENT '頻道ID',
   `type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '類型',
-  `message` text(255) COLLATE utf8_unicode_ci NOT NULL,
+  `message` text(16383) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`messageId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='聊天室訊息';
 
