@@ -1,11 +1,11 @@
 'use strict';
-var crypto=require('crypto');
-var util=require('util');
-var Base=require('./Base.js');
-var channel=require('../channel.js');
-var config=require('../config.js');
-var user=require('../user.js');
-var actionGroup=require('../actionGroup.js');
+let crypto=require('crypto');
+let util=require('util');
+let Base=require('./Base.js');
+let channel=require('../channel.js');
+let config=require('../config.js');
+let user=require('../user.js');
+let actionGroup=require('../actionGroup.js');
 
 /* 驗證身份指令組 */
 function Auth(link){
@@ -29,7 +29,7 @@ Auth.prototype.createSession=function(data,link){
 		data.hasOwnProperty('username') && user.fieldCheck.username(data.username) &&
 		data.hasOwnProperty('answer') && (data.answer=Base.toBuffer(data.answer)) && user.fieldCheck.answer(data.answer)
 	)) return;
-	var _=this;
+	let _=this;
 	let question=link._question;
 	this._authing=true;
 	link._question=null;
@@ -59,7 +59,7 @@ Auth.prototype.authBySession=function(data,link){
 		data.hasOwnProperty('userId') && user.fieldCheck.userId(data.userId) &&
 		data.hasOwnProperty('session') && (data.session=Base.toBuffer(data.session)) && user.fieldCheck.session(data.session)
 	)) return;
-	var _=this;
+	let _=this;
 	this._authing=true;
 	user.authBySession(data.userId,data.session,link,function(result){
 		if(result=='disabled')
