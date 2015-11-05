@@ -256,9 +256,7 @@ Object.defineProperty(db,'queryQueueCount',{
 		let args=[];
 		if(!Object.keys(filter).every((key) => fields.indexOf(key)!==-1))
 			throw new Error('filter have not allow field');
-		typeof(filter.startMessageId)!='undefined' && where.push('`messageId`>=?') && args.push(filter.startMessageId);
-		typeof(filter.startTime)!='undefined' && where.push('`time`>?') && args.push(filter.startTime);
-		typeof(filter.endTime)!='undefined' && where.push('`time`<?') && args.push(filter.endTime);
+		typeof(filter.channelId)!='undefined' && where.push('`channelId`'+sql_isOrIn(filter.channelId)) && args.push(filter.channelId);
 		if(typeof(filter.userId)!='undefined'){
 			where.push('(`fromUserId`=? OR `toUserId`=?)') && args.push(filter.userId,filter.userId);
 		}else if(typeof(filter.userId2)!='undefined'){
@@ -266,7 +264,9 @@ Object.defineProperty(db,'queryQueueCount',{
 		}else{//去除指向性廣播用
 			where.push('`toUserId` IS NULL');
 		}
-		typeof(filter.channelId)!='undefined' && where.push('`channelId`'+sql_isOrIn(filter.channelId)) && args.push(filter.channelId);
+		typeof(filter.startMessageId)!='undefined' && where.push('`messageId`>=?') && args.push(filter.startMessageId);
+		typeof(filter.startTime)!='undefined' && where.push('`time`>?') && args.push(filter.startTime);
+		typeof(filter.endTime)!='undefined' && where.push('`time`<?') && args.push(filter.endTime);
 		typeof(filter.type)!='undefined' && where.push('`type`'+sql_isOrIn(filter.type)) && args.push(filter.type);
 		filter.limit>0 && (resultLimit=filter.limit) && (limit=' LIMIT ?') && args.push(filter.limit);
 		pool.query(

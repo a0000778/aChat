@@ -14,7 +14,9 @@ CREATE TABLE `chatlog` (
   `channelId` smallint(5) unsigned DEFAULT NULL COMMENT '頻道ID',
   `type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '類型',
   `message` text(16383) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`messageId`)
+  PRIMARY KEY (`messageId`),
+  KEY `public` (`channelId`,`time`),
+  KEY `private` (`fromUserId`,`toUserId`,`time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='聊天室訊息';
 
 CREATE TABLE `session` (
@@ -24,7 +26,8 @@ CREATE TABLE `session` (
   `createTime` datetime(3) NOT NULL COMMENT '建立時間',
   `lastClient` varchar(150) DEFAULT NULL COMMENT '最後使用用戶端',
   `lastLogin` datetime(3) DEFAULT NULL COMMENT '最後登入時間',
-  PRIMARY KEY (`session`)
+  PRIMARY KEY (`session`),
+  KEY `userId` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `user` (
