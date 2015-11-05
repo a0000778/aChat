@@ -89,7 +89,7 @@ Auth.prototype.authBySession=function(data,link){
 					'type': 1
 				},function(message){
 					messageCount++;
-					message.action='chat_private';
+					message.action='chat_private_offline';
 					message.time=new Date(message.time).getTime();
 					delete message.type;
 					link.send(message);

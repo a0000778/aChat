@@ -40,7 +40,7 @@
 
 #### 返回結果
 ##### 驗證成功
-返回以下指令後，移動至預設頻道，轉送 Normal 指令集。
+返回以下指令後，移動至預設頻道並輸出離線留言，轉送 Normal 指令集。
 
 * `action` (String) authBySession
 * `status` (String) success

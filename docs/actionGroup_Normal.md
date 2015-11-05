@@ -59,13 +59,15 @@
 
 #### 返回結果
 ##### 成功
-見 伺服端主動發送指令列表 chat_private
+見 伺服端主動發送指令列表 `chat_private` 及 `chat_private_offline`
 
-##### 失敗 - 目標不在線
+##### 失敗
 發送方收到以下格式的訊息。
 
 * `action` (String) chat_private
-* `error` (String) offline or not exists
+* `error` (String) 錯誤
+	* `not exists` 目標不存在
+	* `disable` 目標被停用
 * `toUserId` (Number) 目標使用者ID
 
 ### chatlog_query
@@ -240,6 +242,15 @@
 有發送給使用者或由使用者發送的密頻訊息
 #### 欄位
 * `action` (String) chat_private
+* `fromUserId` (Number) 發言者ID
+* `toUserId` (Number) 目標使用者ID
+* `msg` (String) 訊息內容
+* `time` (Number) 發送時間的 Unix Time (ms)
+
+### chat_private_offline
+有發送給使用者或由使用者發送的離線密頻留言
+#### 欄位
+* `action` (String) chat_private_private
 * `fromUserId` (Number) 發言者ID
 * `toUserId` (Number) 目標使用者ID
 * `msg` (String) 訊息內容

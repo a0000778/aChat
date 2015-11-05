@@ -101,19 +101,19 @@ Normal.prototype.chat_private=function(data,link){
 		Number.isSafeInteger(data.toUserId) && data.toUserId>0 && 
 		typeof(data.msg)==='string' && data.msg.length
 	)) return;
-	var target=user.findUser('userId',data.toUserId);
+	let time=new Date();
+	if(this._quota_sendMsg<=0){
+		link.send({
+			'action': 'chat_notice',
+			'msg': '超過每20秒發言頻率上限，請稍候再試。',
+			'time': time
+		});
+		this._quota_sendMsg-=quota_sendMsg;
+		return;
+	}
+	this._quota_sendMsg--;
+	let target=user.findUser('userId',data.toUserId);
 	if(target){
-		let time=new Date();
-		if(this._quota_sendMsg<=0){
-			link.send({
-				'action': 'chat_notice',
-				'msg': '超過每20秒發言頻率上限，請稍候再試。',
-				'time': time
-			});
-			this._quota_sendMsg-=quota_sendMsg;
-			return;
-		}
-		this._quota_sendMsg--;
 		let sendData=JSON.stringify({
 			'action': 'chat_private',
 			'fromUserId': this._user.userId,
@@ -125,10 +125,29 @@ Normal.prototype.chat_private=function(data,link){
 		this._user.send(sendData);
 		user.lastMessageId=db.writeChatLog(time,1,null,this._user.userId,target.userId,data.msg);
 	}else{
-		this._user.send({
-			'action': 'chat_private',
-			'error': 'offline or not exists',
-			'toUserId': data.toUserId
+		user.getProfile(data.toUserId,(result) => {
+			if(!result){
+				this._user.send({
+					'action': 'chat_private',
+					'error': 'not exists',
+					'toUserId': data.toUserId
+				});
+			}else if(result.active){
+				this._user.send({
+					'action': 'chat_private_offline',
+					'fromUserId': this._user.userId,
+					'toUserId': data.toUserId,
+					'msg': data.msg,
+					'time': time.getTime()
+				});
+				user.lastMessageId=db.writeChatLog(time,1,null,this._user.userId,target.userId,data.msg);
+			}else{
+				this._user.send({
+					'action': 'chat_private',
+					'error': 'disabled',
+					'toUserId': data.toUserId
+				});
+			}
 		});
 	}
 }
