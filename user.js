@@ -244,7 +244,7 @@ user.removeSession=function(session,callback){
 */
 user.resetPassword=function(userId,callback){
 	let password=crypto.randomBytes(4).toString('hex');
-	db.updateUserInfo(userId,{
+	db.updateUserData(userId,{
 		'password': passwordHash(password)
 	},function(){
 		callback(password);
