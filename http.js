@@ -32,7 +32,8 @@ router.post('/v1/forgotPassword',function(req,res){
 				'action': 'resetPassword',
 				'timeout': Date.now()+config.mailTimeout,
 				'userId': result.userId,
-				'username': result.username
+				'username': result.username,
+				'email': result.email
 			}
 			let mailTemplate=config.mailTemplate.forgotPassword;
 			let mailArgs={
@@ -75,11 +76,11 @@ router.post('/v1/resetPassword',function(req,res){
 				'password': password
 			};
 			mailer.sendMail({
-				'from': config.mailCheckSender,
-				'to': result.email,
+				'from': config.mailSender,
+				'to': actionInfo.email,
 				'subject': renderTemplate(mailTemplate.subject,mailArgs),
-				'text': renderTemplate(mailTemplate.contextText,mailArgs),
-				'html': renderTemplate(mailTemplate.contextHTML,mailArgs)
+				'text': renderTemplate(mailTemplate.contentText,mailArgs),
+				'html': renderTemplate(mailTemplate.contentHTML,mailArgs)
 			});
 		});
 	});
